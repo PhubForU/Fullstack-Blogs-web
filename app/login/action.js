@@ -2,11 +2,9 @@
 import { PrismaClient } from "@prisma/client";
 import { createSession } from "../(lib)/sessions";
 
-export default async function 
-
-loginAction({ email, password }) {
+export default async function loginAction({ email, password }) {
     const prisma = new PrismaClient();
-    
+
     try {
         const user = await prisma.user.findUnique({
             where: {
@@ -14,7 +12,7 @@ loginAction({ email, password }) {
             },
         });
         if (user == null) {
-            throw new Error("user not found");
+            throw new Error();
         } else {
             if (password == user.password) {
                 const session = await createSession({
@@ -28,10 +26,10 @@ loginAction({ email, password }) {
                     throw new Error(session.message);
                 }
             } else {
-                throw new Error("wrong password");
+                throw new Error();
             }
         }
     } catch (err) {
-        return { message: err.message, success: false };
+        return { message: "invalid username or password", success: false };
     }
 }

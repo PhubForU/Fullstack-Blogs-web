@@ -2,7 +2,19 @@
 @tailwind components;
 @tailwind utilities;
 
-.tiptap {
-    width: 80%;
-    border: 2px solid red;
+.text-field {
+    border: 2px solid gray;
+    border-radius: 10px;
+    width: 90%;
+    padding: 9px;
+    font-size: 15px;
+    margin-top: 10px;
+}
+input:focus {
+    outline-color: black;
+}
+.text-msg {
+    width: 86%;
+    font-size: 11px;
+    color: red;
 }

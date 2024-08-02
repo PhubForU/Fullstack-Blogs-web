@@ -20,7 +20,9 @@ export default async function signUpAction({ name, email, password }) {
             },
         });
         if (usernameExists) {
-            throw new Error("please choose another username");
+            throw new Error(
+                "username already exists, please choose another name"
+            );
         }
 
         const res = await prisma.user.create({
