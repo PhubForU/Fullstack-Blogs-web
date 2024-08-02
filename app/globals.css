@@ -1,0 +1,8 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+.tiptap {
+    width: 80%;
+    border: 2px solid red;
+}
