@@ -29,6 +29,7 @@ model Post {
   createdAt   DateTime  @default(now())
   isEdited Boolean @default(false)
   comments    Comment[]
+  imageId String
 }
 
 model Comment {
