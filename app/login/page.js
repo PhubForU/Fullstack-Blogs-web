@@ -97,7 +97,7 @@ export default function Login() {
                     submit
                 </button>
                 <div className="w-[90%] text-sm p-1 pt-3">
-                    Didn't have an account?{" "}
+                    Didn&apos;t have an account?{" "}
                     <Link href={"/signup"}>
                         <u>
                             <strong>Register here</strong>
