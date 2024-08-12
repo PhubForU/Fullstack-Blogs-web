@@ -2,8 +2,9 @@
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useForm } from "react-hook-form";
 import { z } from "zod";
-import { commentAction } from "./action";
 import { useRef } from "react";
+import toast from "react-hot-toast";
+import { commentAction } from "./action";
 
 export function Comment({ postId, slug }) {
     const formRef = useRef(null);
@@ -25,6 +26,7 @@ export function Comment({ postId, slug }) {
             const res = await commentAction(postId, data.comment, slug);
             if (res) {
                 formRef.current?.reset();
+                toast.success("comment added");
             }
         } catch (err) {
             throw err;

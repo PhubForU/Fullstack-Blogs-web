@@ -39,8 +39,28 @@ export async function deleteButtonAction(id, imageId) {
             },
         });
         cloudinary.uploader.destroy(imageId);
-        return {success:true}
+        return { success: true };
     } catch (err) {
-        return {message: err.message, success:false}
+        return { message: err.message, success: false };
     }
 }
+
+export async function getUser(userId) {
+    const prisma = new PrismaClient();
+    try {
+        const user = await prisma.user.findFirst({
+            where: {
+                id: userId,
+            },
+            include: {
+                password: false,
+                id: false,
+            },
+        });
+        if (!user) {
+            return "unknown";
+        }
+        return user;
+    } catch (err) {}
+}
+
