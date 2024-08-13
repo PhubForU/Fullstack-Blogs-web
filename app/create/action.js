@@ -1,7 +1,7 @@
 "use server";
 
 import { decrypt, verifySession } from "@/app/(lib)/sessions";
-import { PrismaClient } from "@prisma/client";
+import prisma from "../(lib)/prisma";
 import { cookies } from "next/headers";
 import { v2 as cloudinary } from "cloudinary";
 
@@ -41,10 +41,6 @@ export async function uploadImage(FormData) {
     } catch (err) {
         return { message: err.message, success: false };
     }
-
-    // } else {
-    //     return { message: "authorization error", success: false };
-    // }
 }
 
 export async function createSlug(input) {
@@ -57,7 +53,6 @@ export async function createSlug(input) {
 }
 
 export async function createPostAction(data) {
-    const prisma = new PrismaClient();
     try {
         const user = await decrypt(cookies().get("session")?.value);
         if (!user.success) {
@@ -82,7 +77,6 @@ export async function createPostAction(data) {
 }
 
 export async function doTitleExist(title) {
-    const prisma = new PrismaClient();
     const res = await prisma.post.findMany({
         where: {
             title: title,

@@ -1,4 +1,4 @@
-import { PrismaClient } from "@prisma/client";
+import prisma from "@/app/(lib)/prisma";
 import { notFound } from "next/navigation";
 import { Comment } from "./comments";
 import { decrypt } from "@/app/(lib)/sessions";
@@ -9,70 +9,57 @@ import { GoDotFill } from "react-icons/go";
 import Timeago from "./timeago";
 import { getPlaiceholder } from "plaiceholder";
 import { TbFileSad } from "react-icons/tb";
-import { getUser } from "./action";
-import Cmnt from "./cmnt";
-import { Suspense } from "react";
-import { revalidatePath } from "next/cache";
+import { FaCircleUser } from "react-icons/fa6";
+import { MdLogin } from "react-icons/md";
 
 export default async function Slug({ params }) {
-    const prisma = new PrismaClient();
-
-    //code for fetching post details from slug
     const post = await prisma.post.findFirst({
         where: {
             slug: params.slug,
         },
+        include: {
+            comments: {
+                include: {
+                    cmntAuthor: {
+                        include: {
+                            password: false,
+                        },
+                    },
+                },
+                orderBy: {
+                    createdAt: "desc",
+                },
+            },
+            author: {
+                include: {
+                    password: false,
+                },
+            },
+        },
     });
+
     if (post == null) {
         return notFound();
     }
+    const comments = post.comments;
 
     const currentUser = await decrypt(cookies().get("session")?.value);
-
-    //code for fetching comments from database
-
-    const comments = await prisma.comment.findMany({
-        where: {
-            postId: post.id,
-        },
-        orderBy: {
-            createdAt: "desc",
-        },
-    });
 
     const buffer = await fetch(post.image).then(async (res) => {
         return Buffer.from(await res.arrayBuffer());
     });
     const { base64 } = await getPlaiceholder(buffer);
 
-    const postedBy = await getUser(post.authorId);
-
     return (
         <div className="md:mx-[10%] mx-4 flex flex-col items-center">
-            {/* title of the post */}
             <div className="text-3xl font-semibold mt-10 mb-1 text-center">
                 {post.title}
             </div>
 
-            {/* meta details of the post */}
             <div className="flex items-center my-2">
-                {post.authorId == currentUser?.id ? (
-                    <div className="flex items-center">
-                        <p className="font-medium text-sm text-gray-500">
-                            posted by you
-                        </p>
-
-                        <div className="mx-2">
-                            <GoDotFill color="grey" size={"0.5em"} />
-                        </div>
-
-                        <DeleteButton id={post?.id} imageId={post?.imageId} />
-                    </div>
-                ) : (
-                    <p className="font-medium text-sm text-gray-500">
-                        posted by {postedBy?.name}
-                    </p>
-                )}
+                <p className="font-medium text-sm text-gray-500">
+                    posted by {post?.author?.name}
+                </p>
 
                 <div className="mx-2">
                     <GoDotFill color="grey" size={"0.5em"} />
@@ -104,17 +91,22 @@ export default async function Slug({ params }) {
                 <div className="font-semibold text-3xl">Comments</div>
             </div>
 
-            <div className="w-full">
+            <div className="w-full h-[70px] py-2">
                 {cookies().get("session")?.value ? (
-                    <div>
+                    <div className="h-[70px] pl-[2px]">
                         <Comment postId={post.id} slug={params.slug} />
                     </div>
                 ) : (
-                    <p>please signin to add comment</p>
+                    <div className="flex gap-2 items-center py-3">
+                        <MdLogin size={"1.4em"} />
+                        <div className="font-semibold text-sm">
+                            please login to add comments.
+                        </div>
+                    </div>
                 )}
             </div>
 
-            <div className="w-full">
+            <div className="w-full mt-2">
                 {comments?.length == 0 ? (
                     <div className="flex gap-1 items-center mt-2 mb-8">
                         <TbFileSad size={"1.5em"} />
@@ -123,13 +115,39 @@ export default async function Slug({ params }) {
                         </p>
                     </div>
                 ) : (
-                    <div className="flex flex-col gap-1 py-7 mb-6">
-                        {comments.map((ele, i) => (
+                    <div className="flex flex-col gap-2">
+                        {comments.map((comment, i) => (
                             <div key={i}>
-                                <Cmnt
-                                    cmnt={ele}
-                                    cmntAuthorId={ele.cmntAuthorId}
-                                />
+                                <div className="flex gap-[10px] items-center py-3">
+                                    <div className="">
+                                        <FaCircleUser
+                                            size={"2.6em"}
+                                            className="pt-[1px]"
+                                        />
+                                    </div>
+
+                                    <div className="flex flex-col gap-[1.1px]">
+                                        <div className="flex gap-[5px] items-center">
+                                            <p className="font-bold text-[14px]">
+                                                @{comment?.cmntAuthor.name}
+                                            </p>
+
+                                            <GoDotFill
+                                                color="grey"
+                                                size={"0.4em"}
+                                            />
+
+                                            <p className="text-[12px] font-medium text-[grey]">
+                                                <Timeago
+                                                    date={comment?.createdAt}
+                                                />
+                                            </p>
+                                        </div>
+                                        <div className="text-sm font-normal">
+                                            {comment?.comment}
+                                        </div>
+                                    </div>
+                                </div>
                             </div>
                         ))}
                     </div>

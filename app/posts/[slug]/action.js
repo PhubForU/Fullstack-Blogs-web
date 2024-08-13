@@ -1,13 +1,11 @@
 "use server";
 import { decrypt } from "@/app/(lib)/sessions";
-import { PrismaClient } from "@prisma/client";
+import prisma from "@/app/(lib)/prisma";
 import { revalidatePath } from "next/cache";
 import { cookies } from "next/headers";
 import { v2 as cloudinary } from "cloudinary";
 
 export async function commentAction(postId, comment, slug) {
-    const prisma = new PrismaClient();
-
     try {
         const user = await decrypt(cookies().get("session")?.value);
         const res = await prisma.comment.create({
@@ -18,9 +16,9 @@ export async function commentAction(postId, comment, slug) {
             },
         });
         revalidatePath(process.env.BASE_URL + "/posts/" + slug);
-        return res;
+        return { res, success: true };
     } catch (err) {
-        throw err;
+        return { message: err.message, success: false };
     }
 }
 
@@ -44,23 +42,3 @@ export async function deleteButtonAction(id, imageId) {
         return { message: err.message, success: false };
     }
 }
-
-export async function getUser(userId) {
-    const prisma = new PrismaClient();
-    try {
-        const user = await prisma.user.findFirst({
-            where: {
-                id: userId,
-            },
-            include: {
-                password: false,
-                id: false,
-            },
-        });
-        if (!user) {
-            return "unknown";
-        }
-        return user;
-    } catch (err) {}
-}
-
