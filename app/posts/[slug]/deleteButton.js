@@ -14,6 +14,7 @@ export default function DeleteButton({ id, imageId }) {
         const isDeleted = await deleteButtonAction(id, imageId);
         if (!isDeleted.success) {
             setMsg(isDeleted.message);
+            return;
         }
         router.push("/");
         toast.success("post deleted");
@@ -21,7 +22,7 @@ export default function DeleteButton({ id, imageId }) {
     return (
         <div>
             <button onClick={() => deletePost()}>delete post</button>
-            {msg && <p>msg</p>}
+            {msg && <p>{msg}</p>}
         </div>
     );
 }

@@ -23,7 +23,6 @@ export async function commentAction(postId, comment, slug) {
 }
 
 export async function deleteButtonAction(id, imageId) {
-    const prisma = new PrismaClient();
     cloudinary.config({
         cloud_name: process.env.CLOUDINARY_CLOUD_NAME,
         api_key: process.env.CLOUDINARY_API_KEY,

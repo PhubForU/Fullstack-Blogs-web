@@ -11,6 +11,7 @@ import { getPlaiceholder } from "plaiceholder";
 import { TbFileSad } from "react-icons/tb";
 import { FaCircleUser } from "react-icons/fa6";
 import { MdLogin } from "react-icons/md";
+import Link from "next/link";
 
 export default async function Slug({ params }) {
     const post = await prisma.post.findFirst({
@@ -41,6 +42,7 @@ export default async function Slug({ params }) {
     if (post == null) {
         return notFound();
     }
+
     const comments = post.comments;
 
     const currentUser = await decrypt(cookies().get("session")?.value);
@@ -58,7 +60,10 @@ export default async function Slug({ params }) {
 
             <div className="flex items-center my-2">
                 <p className="font-medium text-sm text-gray-500">
-                    posted by {post?.author?.name}
+                    posted by{" "}
+                    {currentUser?.id == post?.author?.id
+                        ? "you"
+                        : post?.author?.name}
                 </p>
 
                 <div className="mx-2">
@@ -68,16 +73,32 @@ export default async function Slug({ params }) {
                 <p className="font-medium text-sm text-gray-500">
                     <Timeago date={post?.createdAt} />
                 </p>
+
+                {currentUser?.id == post?.author?.id ? (
+                    <div className="flex items-center my-2 ml-4">
+                        <DeleteButton id={post?.id} imageId={post?.imageId} />
+                        <div className="mx-2">
+                            <GoDotFill color="grey" size={"0.5em"} />
+                        </div>
+                        <Link href={`/update/${post?.id}`}>
+                            <button>Update</button>
+                        </Link>
+                    </div>
+                ) : (
+                    ""
+                )}
             </div>
 
             <div className="w-full overflow-hidden flex items-center justify-center rounded-md my-2">
-                {/* <Image
+                <Image
                     src={post.image}
                     placeholder="blur"
                     width={1130}
                     height={600}
                     blurDataURL={base64}
-                /> */}
+                    alt="cover image"
+                    key={post.imageId}
+                />
             </div>
 
             <div
@@ -93,15 +114,17 @@ export default async function Slug({ params }) {
 
             <div className="w-full h-[70px] py-2">
                 {cookies().get("session")?.value ? (
-                    <div className="h-[70px] pl-[2px]">
+                    <div className="h-[70px]">
                         <Comment postId={post.id} slug={params.slug} />
                     </div>
                 ) : (
                     <div className="flex gap-2 items-center py-3">
                         <MdLogin size={"1.4em"} />
-                        <div className="font-semibold text-sm">
-                            please login to add comments.
-                        </div>
+                        <Link href={"/login"} target="_blank">
+                            <div className="font-medium text-sm cursor-pointer">
+                                please <u>login</u> to add comments.
+                            </div>
+                        </Link>
                     </div>
                 )}
             </div>
@@ -121,7 +144,7 @@ export default async function Slug({ params }) {
                                 <div className="flex gap-[10px] items-center py-3">
                                     <div className="">
                                         <FaCircleUser
-                                            size={"2.6em"}
+                                            size={"2.2em"}
                                             className="pt-[1px]"
                                         />
                                     </div>
