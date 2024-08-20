@@ -45,6 +45,7 @@ export async function replaceImage(FormData) {
                         public_id: publicId,
                         overwrite: true,
                         invalidate: true,
+                        quality: "auto",
                     },
                     function (err, result) {
                         if (err) {
@@ -83,7 +84,7 @@ export async function updatePostAction(data) {
                 image: data.image,
                 imageId: data.imageId,
                 slug: data.slug,
-                isEdited: false,
+                isEdited: true,
             },
         });
         return { ...post, success: true };
@@ -92,14 +93,17 @@ export async function updatePostAction(data) {
     }
 }
 
-export async function doTitleExist(title) {
+export async function validateTitle(title, id) {
     const res = await prisma.post.findMany({
         where: {
             title: title,
         },
     });
     if (res.length == 0) {
-        return false;
+        return true;
     }
-    return true;
+    if (res[0].id == id) {
+        return true;
+    }
+    return false;
 }

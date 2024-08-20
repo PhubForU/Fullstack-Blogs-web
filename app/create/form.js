@@ -3,36 +3,30 @@
 import { z } from "zod";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useForm } from "react-hook-form";
-import { useEffect, useState } from "react";
+import { useState } from "react";
 import {
+    createPostAction,
     createSlug,
     doTitleExist,
-    getPostDetails,
-    replaceImage,
-    test,
-    updatePostAction,
-    validateTitle,
+    uploadImage,
 } from "./action";
 import { useEditor } from "@tiptap/react";
 import StarterKit from "@tiptap/starter-kit";
-import { Tiptap } from "../../(lib)/tiptap";
+import { Tiptap } from "../(lib)/tiptap";
 import Underline from "@tiptap/extension-underline";
 import Highlight from "@tiptap/extension-highlight";
 import TextAlign from "@tiptap/extension-text-align";
 import toast from "react-hot-toast";
-import { notFound, useRouter } from "next/navigation";
+import { useRouter } from "next/navigation";
 import { FaImage } from "react-icons/fa6";
 import Placeholder from "@tiptap/extension-placeholder";
 import { MdOutlinePostAdd } from "react-icons/md";
-import { verifySession } from "../../(lib)/sessions";
-import { useParams } from "next/navigation";
-import prisma from "@/app/(lib)/prisma";
 
-export default function UpdateForm({ postData }) {
-    const postDetails = postData;
+export default function CreateForm() {
     const router = useRouter();
 
     const [img, setImg] = useState(null);
+    const [imgErr, setImgErr] = useState("");
     const [descErr, setDescErr] = useState("");
 
     //zod schema for form
@@ -50,67 +44,55 @@ export default function UpdateForm({ postData }) {
 
     //function to post data to database
     async function post(data) {
+        setImgErr("");
         setDescErr("");
 
+        if (!img) {
+            setImgErr("please choose a cover photo");
+            return;
+        }
         if (editor?.isEmpty) {
             setDescErr("please write your blog");
             return;
         }
 
-        const loadingToast = toast.loading("please wait...");
+        const titleExist = await doTitleExist(data.title);
 
-        const updatedPost = {
-            id: postDetails.id,
-            title: data.title,
-            description: editor?.getHTML(),
-            category: data.category,
-            slug: await createSlug(data.title),
-        };
-        const isValidTitle = await validateTitle(data.title, postData.id);
-        
-        if (!isValidTitle) {
+        const loadingToast = toast.loading("please wait...");
+        if (!titleExist) {
+            const imageData = new FormData();
+            imageData.append("image", img);
+            const image = await uploadImage(imageData);
+            if (!image.success) {
+                toast.dismiss(loadingToast);
+                toast(image.message, {
+                    icon: "🥴",
+                });
+                return;
+            }
+            const postData = {
+                title: data.title,
+                description: editor?.getHTML(),
+                category: data.category,
+                image: image.url,
+                imageId: image?.publicId,
+                slug: await createSlug(data.title),
+            };
+
+            const result = await createPostAction(postData);
+            if (!result.success) {
+                toast.dismiss(loadingToast);
+                toast.error(result.message);
+            } else {
+                toast.dismiss(loadingToast);
+                toast.success("Blog created sucessfully");
+                router.push(`/blog/${postData.slug}`);
+            }
+        } else {
             toast.dismiss(loadingToast);
             toast("title already exists, try a unique title", {
                 icon: "🥲",
             });
-            return;
-        }
-        
-        if (img) {
-            const imageData = new FormData();
-            imageData.append("image", img);
-            imageData.append("publicId", postDetails.imageId);
-            const image = await replaceImage(imageData);
-            if (image.success) {
-                updatedPost.image = image.secure_url;
-                const res = await updatePostAction(updatedPost);
-                if (!res.success) {
-                    toast.dismiss(loadingToast);
-                    toast.error("unable to update post!");
-                    return;
-                }
-                toast.dismiss(loadingToast);
-                toast.success("post updated sucessfully");
-                router.push(`/blog/${res.slug}`);
-                return;
-            } else {
-                console.log(image.message);
-                toast.dismiss(loadingToast);
-                toast.error("unable to upload photo");
-                return;
-            }
-        } else {
-            const res = await updatePostAction(updatedPost);
-            if (!res.success) {
-                console.log(res.message);
-                toast.dismiss(loadingToast);
-                toast.error("unable to update post!");
-                return;
-            }
-            toast.dismiss(loadingToast);
-            toast.success("post updated sucessfully");
-            router.push(`/blog/${res.slug}`);
-            return;
         }
     }
 
@@ -127,7 +109,7 @@ export default function UpdateForm({ postData }) {
                 placeholder: "write something...",
             }),
         ],
-        content: `${postData.description}`,
+        content: "",
         immediatelyRender: false,
         editorProps: {
             attributes: {
@@ -150,7 +132,6 @@ export default function UpdateForm({ postData }) {
                         type="text"
                         placeholder="Title..."
                         className="border-b-2 md:w-[85%] w-[100%] focus:outline-none md:text-2xl text-xl font-medium pb-2"
-                        defaultValue={postData.title}
                     />
                     <div className="h-3">
                         {errors.title?.message && (
@@ -167,7 +148,6 @@ export default function UpdateForm({ postData }) {
                         <select
                             {...register("category")}
                             id="drop"
-                            defaultValue={postData.category}
                             className="border-b-2 w-full pl-2 pb-2 pt-2 md:pt-1 rounded-md bg-none text-medium font-medium text-gray-500 focus:outline-none"
                         >
                             <option value="">select category</option>
@@ -197,6 +177,13 @@ export default function UpdateForm({ postData }) {
                                 accept="image/*"
                             />
                         </div>
+                        <div className="h-4">
+                            {imgErr && (
+                                <p className="text-red-400 font-medium text-xs pt-2 pl-1">
+                                    {imgErr}*
+                                </p>
+                            )}
+                        </div>
                     </div>
                 </div>
 
@@ -219,7 +206,7 @@ export default function UpdateForm({ postData }) {
                         className="bg-black text-white text-sm font-medium px-5 py-2 rounded-lg disabled:cursor- disabled:text-slate-300 flex gap-2 items-center"
                     >
                         <MdOutlinePostAdd size={"1.2em"} />
-                        Update Blog
+                        Add Blog
                     </button>
                 </div>
             </form>

@@ -6,12 +6,13 @@ import { cookies } from "next/headers";
 import Image from "next/image";
 import DeleteButton from "./deleteButton";
 import { GoDotFill } from "react-icons/go";
-import Timeago from "./timeago";
+import Timeago from "../../(lib)/timeago";
 import { getPlaiceholder } from "plaiceholder";
 import { TbFileSad } from "react-icons/tb";
 import { FaCircleUser } from "react-icons/fa6";
 import { MdLogin } from "react-icons/md";
 import Link from "next/link";
+import { AiTwotoneEdit } from "react-icons/ai";
 
 export default async function Slug({ params }) {
     const post = await prisma.post.findFirst({
@@ -47,9 +48,10 @@ export default async function Slug({ params }) {
 
     const currentUser = await decrypt(cookies().get("session")?.value);
 
-    const buffer = await fetch(post.image).then(async (res) => {
+    let buffer = await fetch(post?.image).then(async (res) => {
         return Buffer.from(await res.arrayBuffer());
     });
+
     const { base64 } = await getPlaiceholder(buffer);
 
     return (
@@ -58,46 +60,56 @@ export default async function Slug({ params }) {
                 {post.title}
             </div>
 
-            <div className="flex items-center my-2">
-                <p className="font-medium text-sm text-gray-500">
+            <div className="flex items-center my-3 md:text-sm text-xs font-medium text-gray-500">
+                <p>
                     posted by{" "}
                     {currentUser?.id == post?.author?.id
                         ? "you"
-                        : post?.author?.name}
+                        : "@" + post?.author?.name}
                 </p>
 
-                <div className="mx-2">
+                <div className="mx-[6px]">
                     <GoDotFill color="grey" size={"0.5em"} />
                 </div>
 
-                <p className="font-medium text-sm text-gray-500">
+                <p>
                     <Timeago date={post?.createdAt} />
                 </p>
 
-                {currentUser?.id == post?.author?.id ? (
-                    <div className="flex items-center my-2 ml-4">
-                        <DeleteButton id={post?.id} imageId={post?.imageId} />
-                        <div className="mx-2">
+                {post?.isEdited && (
+                    <div className="flex items-center">
+                        <div className="mx-[6px]">
                             <GoDotFill color="grey" size={"0.5em"} />
                         </div>
-                        <Link href={`/update/${post?.id}`}>
-                            <button>Update</button>
-                        </Link>
+                        <p>Edited</p>
                     </div>
-                ) : (
-                    ""
                 )}
             </div>
 
+            {/* edit and delete buttons */}
+            {currentUser?.id == post?.author?.id ? (
+                <div className="flex items-center mt-[6px] mb-3 md:text-sm text-xs font-medium text-gray-500 gap-3">
+                    <DeleteButton id={post?.id} imageId={post?.imageId} />
+
+                    <Link href={`/update/${post?.id}`}>
+                        <button className="flex items-center gap-2 px-2 py-1 rounded-md bg-slate-100 hover:bg-slate-200">
+                            <AiTwotoneEdit />
+                            <p className="pr-1">Edit</p>
+                        </button>
+                    </Link>
+                </div>
+            ) : (
+                ""
+            )}
+
             <div className="w-full overflow-hidden flex items-center justify-center rounded-md my-2">
                 <Image
-                    src={post.image}
+                    src={post?.image}
                     placeholder="blur"
                     width={1130}
                     height={600}
                     blurDataURL={base64}
                     alt="cover image"
-                    key={post.imageId}
                 />
             </div>
 
@@ -120,7 +132,7 @@ export default async function Slug({ params }) {
                 ) : (
                     <div className="flex gap-2 items-center py-3">
                         <MdLogin size={"1.4em"} />
-                        <Link href={"/login"} target="_blank">
+                        <Link href={`/login?redirect=/blog/${params.slug}`}>
                             <div className="font-medium text-sm cursor-pointer">
                                 please <u>login</u> to add comments.
                             </div>

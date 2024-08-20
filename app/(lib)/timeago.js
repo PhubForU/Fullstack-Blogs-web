@@ -6,6 +6,5 @@ TimeAgo.addDefaultLocale(en);
 TimeAgo.addLocale(en);
 
 export default function Timeago(createdAt) {
-    //console.log(createdAt.date);
     return <ReactTimeAgo date={createdAt.date} locale="en-US" />;
 }

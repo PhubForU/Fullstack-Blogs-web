@@ -23,9 +23,10 @@ export async function uploadImage(FormData) {
         if (!user) {
             throw new Error("you are not authorized, please login!");
         }
+
         const post = await new Promise((resolve, reject) => {
             cloudinary.uploader
-                .upload_stream(function (err, result) {
+                .upload_stream({ quality: "auto" }, function (err, result) {
                     if (err) {
                         throw new Error("unable to upload image");
                     }
@@ -33,6 +34,7 @@ export async function uploadImage(FormData) {
                 })
                 .end(buffer);
         });
+        console.log(post)
         return {
             url: post.secure_url,
             publicId: post.public_id,
