@@ -12,7 +12,7 @@ export default async function Search({ searchParams }) {
     const searchString = searchParams.query || "";
 
     const currentPage = searchParams.page || 1;
-    const postsPerPage = 2;
+    const postsPerPage = 4;
     const lastPost = currentPage * postsPerPage;
     const startPost = lastPost - postsPerPage;
 
@@ -21,20 +21,55 @@ export default async function Search({ searchParams }) {
     }
 
     if (searchString != "") {
-        data = await prisma.post.findMany({
-            where: {
-                title: {
-                    contains: searchString,
-                    mode: "insensitive",
-                },
-            },
-            include: {
-                author: {
-                    include: {
-                        password: false,
+        // data = await prisma.post.findMany({
+        //     where: {
+        //         title: {
+        //             contains: searchString,
+        //             mode: "insensitive",
+        //         },
+        //     },
+        //     include: {
+        //         author: {
+        //             include: {
+        //                 password: false,
+        //             },
+        //         },
+        //     },
+        // });
+
+        //query for fuzzy searching inputstring
+        data = await prisma.post.aggregateRaw({
+            pipeline: [
+                {
+                    $search: {
+                        index: "default",
+                        text: {
+                            query: searchString,
+                            path: ["title", "description"],
+                            fuzzy: {
+                                maxEdits: 2,
+                                prefixLength: 2,
+                            },
+                        },
                     },
                 },
-            },
+                {
+                    $lookup: {
+                        from: "User",
+                        localField: "authorId",
+                        foreignField: "_id",
+                        as: "author",
+                        pipeline: [
+                            {
+                                $project: {
+                                    password: false,
+                                    _id: false,
+                                },
+                            },
+                        ],
+                    },
+                },
+            ],
         });
     }
 
@@ -91,13 +126,13 @@ export default async function Search({ searchParams }) {
             </form>
 
             {/* result-posts area */}
-            <div>
+            <div className="mb-3">
                 {data?.length == 0 ? (
                     <p>no posts found</p>
                 ) : (
                     result?.map((post) => (
-                        <Link href={`/blog/${post.slug}`} key={post.id}>
-                            <div className="mb-5 mt-1 flex flex-col item sm:flex-row gap-1 p-4 rounded-lg bg-gray-50 hover:bg-gray-100">
+                        <Link href={`/blog/${post.slug}`} key={post.slug}>
+                            <div className="mt-1 mb-3 flex flex-col item sm:flex-row gap-1 p-4 rounded-lg bg-gray-50 hover:bg-gray-100">
                                 <div className="sm:h-56 h-52 sm:w-[40%] md:w-[36%] rounded-md">
                                     <img
                                         src={post.image}
@@ -112,7 +147,7 @@ export default async function Search({ searchParams }) {
                                     </div>
                                     <div className="flex items-center mt-1 text-xs font-medium text-gray-500">
                                         <div>
-                                            posted by @{post?.author.name}
+                                            posted by @{post?.author[0].name}
                                         </div>
 
                                         <div className="mx-[6px]">
@@ -122,11 +157,13 @@ export default async function Search({ searchParams }) {
                                             />
                                         </div>
                                         <div>
-                                            <Timeago date={post?.createdAt} />
+                                            <Timeago
+                                                date={post?.createdAt.$date}
+                                            />
                                         </div>
                                     </div>
                                     <div
-                                        className="text-[12.5px] mt-1 mb-1 leading-5 overflow-hidden"
+                                        className="text-[12.5px] mt-1 mb-2 leading-5 truncate"
                                         dangerouslySetInnerHTML={{
                                             __html: post.description,
                                         }}
@@ -143,7 +180,7 @@ export default async function Search({ searchParams }) {
 
             {/* next-button and previous-button */}
             {totalPages > 1 && (
-                <div className="border-2 flex items-center gap-4 py-2">
+                <div className="flex items-center justify-center sm:justify-end gap-3 pr-2 mb-8">
                     <form action={prevPage}>
                         <button
                             type="submit"
@@ -154,7 +191,7 @@ export default async function Search({ searchParams }) {
                             <p className="pr-2">Previous</p>
                         </button>
                     </form>
-                    <div>
+                    <div className="text-xs font-semibold text-gray-500 mx-2">
                         page {currentPage} of {totalPages}
                     </div>
                     <form action={nextPage}>

@@ -30,6 +30,7 @@ model Post {
   isEdited Boolean @default(false)
   comments    Comment[] 
   imageId String
+  likeCount Int @default(0)
 }
 
 model Comment {

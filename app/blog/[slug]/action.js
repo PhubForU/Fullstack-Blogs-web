@@ -15,7 +15,7 @@ export async function commentAction(postId, comment, slug) {
                 cmntAuthorId: user.id,
             },
         });
-        revalidatePath(process.env.BASE_URL + "/posts/" + slug);
+        revalidatePath("/posts/" + slug);
         return { res, success: true };
     } catch (err) {
         return { message: err.message, success: false };
