@@ -79,6 +79,7 @@ export async function updatePostAction(data) {
             },
             data: {
                 title: data.title,
+                content: data.content,
                 description: data.description,
                 category: data.category,
                 image: data.image,

@@ -116,7 +116,7 @@ export default async function Slug({ params }) {
             <div
                 className="prose-sm prose !max-w-none mt-8"
                 dangerouslySetInnerHTML={{
-                    __html: post.description,
+                    __html: post.content,
                 }}
             />
 

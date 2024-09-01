@@ -27,12 +27,13 @@ export default function CreateForm() {
 
     const [img, setImg] = useState(null);
     const [imgErr, setImgErr] = useState("");
-    const [descErr, setDescErr] = useState("");
+    const [contentErr, setContentErr] = useState("");
 
     //zod schema for form
     const postSchema = z.object({
         title: z.string().min(1, { message: "please enter the title" }),
         category: z.string().min(1, { message: "please select category" }),
+        description: z.string().max(200, { message: "description too long" }),
     });
 
     //assigning zod resolver
@@ -45,14 +46,14 @@ export default function CreateForm() {
     //function to post data to database
     async function post(data) {
         setImgErr("");
-        setDescErr("");
+        setContentErr("");
 
         if (!img) {
             setImgErr("please choose a cover photo");
             return;
         }
         if (editor?.isEmpty) {
-            setDescErr("please write your blog");
+            setContentErr("please write your blog");
             return;
         }
 
@@ -72,7 +73,8 @@ export default function CreateForm() {
             }
             const postData = {
                 title: data.title,
-                description: editor?.getHTML(),
+                description: data.description,
+                content: editor?.getHTML(),
                 category: data.category,
                 image: image.url,
                 imageId: image?.publicId,
@@ -142,6 +144,22 @@ export default function CreateForm() {
                     </div>
                 </div>
 
+                <div className="md:pb-4 pb-3 pl-1">
+                    <input
+                        {...register("description")}
+                        type="text"
+                        placeholder="description..."
+                        className="border-b-2 md:w-[85%] w-[100%] focus:outline-none md:text-xl text-xl font-medium pb-2"
+                    />
+                    <div className="h-3">
+                        {errors.description?.message && (
+                            <p className="text-red-400 font-medium text-xs pt-2">
+                                {errors.description?.message}*
+                            </p>
+                        )}
+                    </div>
+                </div>
+
                 {/* select field and image input tag*/}
                 <div className="pt-[12px] md:flex gap-9 text-sm font-medium pb-2">
                     <div className="md:w-[18%] w-[45%] mr-2">
@@ -191,9 +209,9 @@ export default function CreateForm() {
                 <div className="md:w-[85%] w-[100%]">
                     <Tiptap editor={editor} />
                     <div className="pl-1 h-6 pt-2">
-                        {descErr && (
+                        {contentErr && (
                             <p className="text-red-400 font-medium text-xs">
-                                {descErr}*
+                                {contentErr}*
                             </p>
                         )}
                     </div>

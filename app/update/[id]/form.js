@@ -33,12 +33,13 @@ export default function UpdateForm({ postData }) {
     const router = useRouter();
 
     const [img, setImg] = useState(null);
-    const [descErr, setDescErr] = useState("");
+    const [contentErr, setContentErr] = useState("");
 
     //zod schema for form
     const postSchema = z.object({
         title: z.string().min(1, { message: "please enter the title" }),
         category: z.string().min(1, { message: "please select category" }),
+        description: z.string().max(200, { message: "description too long" }),
     });
 
     //assigning zod resolver
@@ -50,10 +51,10 @@ export default function UpdateForm({ postData }) {
 
     //function to post data to database
     async function post(data) {
-        setDescErr("");
+        setContentErr("");
 
         if (editor?.isEmpty) {
-            setDescErr("please write your blog");
+            setContentErr("please write your blog");
             return;
         }
 
@@ -62,12 +63,13 @@ export default function UpdateForm({ postData }) {
         const updatedPost = {
             id: postDetails.id,
             title: data.title,
-            description: editor?.getHTML(),
+            description: data.description,
+            content: editor?.getHTML(),
             category: data.category,
             slug: await createSlug(data.title),
         };
         const isValidTitle = await validateTitle(data.title, postData.id);
-        
+
         if (!isValidTitle) {
             toast.dismiss(loadingToast);
             toast("title already exists, try a unique title", {
@@ -75,7 +77,7 @@ export default function UpdateForm({ postData }) {
             });
             return;
         }
-        
+
         if (img) {
             const imageData = new FormData();
             imageData.append("image", img);
@@ -127,7 +129,7 @@ export default function UpdateForm({ postData }) {
                 placeholder: "write something...",
             }),
         ],
-        content: `${postData.description}`,
+        content: `${postData.content}`,
         immediatelyRender: false,
         editorProps: {
             attributes: {
@@ -156,6 +158,23 @@ export default function UpdateForm({ postData }) {
                         {errors.title?.message && (
                             <p className="text-red-400 font-medium text-xs pt-2">
                                 {errors.title?.message}*
+                            </p>
+                        )}
+                    </div>
+                </div>
+
+                <div className="md:pb-4 pb-3 pl-1">
+                    <input
+                        {...register("description")}
+                        type="text"
+                        placeholder="description..."
+                        className="border-b-2 md:w-[85%] w-[100%] focus:outline-none md:text-2xl text-xl font-medium pb-2"
+                        defaultValue={postData.description}
+                    />
+                    <div className="h-3">
+                        {errors.description?.message && (
+                            <p className="text-red-400 font-medium text-xs pt-2">
+                                {errors.description?.message}*
                             </p>
                         )}
                     </div>
@@ -204,9 +223,9 @@ export default function UpdateForm({ postData }) {
                 <div className="md:w-[85%] w-[100%]">
                     <Tiptap editor={editor} />
                     <div className="pl-1 h-6 pt-2">
-                        {descErr && (
+                        {contentErr && (
                             <p className="text-red-400 font-medium text-xs">
-                                {descErr}*
+                                {contentErr}*
                             </p>
                         )}
                     </div>

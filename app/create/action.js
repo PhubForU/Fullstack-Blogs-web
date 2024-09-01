@@ -34,7 +34,7 @@ export async function uploadImage(FormData) {
                 })
                 .end(buffer);
         });
-        console.log(post)
+        console.log(post);
         return {
             url: post.secure_url,
             publicId: post.public_id,
@@ -64,6 +64,7 @@ export async function createPostAction(data) {
             data: {
                 title: data.title,
                 description: data.description,
+                content: data.content,
                 image: data.image,
                 imageId: data.imageId,
                 category: data.category,
