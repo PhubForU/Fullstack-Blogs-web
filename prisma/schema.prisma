@@ -21,6 +21,7 @@ model Post {
   id          String    @id @default(auto()) @map("_id") @db.ObjectId
   title       String    @unique
   description String
+  content String
   image       String
   author      User      @relation(fields: [authorId], references: [id])
   category    String
