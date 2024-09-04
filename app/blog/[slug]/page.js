@@ -55,10 +55,12 @@ export default async function Slug({ params }) {
     const { base64 } = await getPlaiceholder(buffer);
 
     return (
-        <div className="md:mx-[10%] mx-4 flex flex-col items-center">
-            <div className="text-3xl font-semibold mt-10 mb-1 text-center">
+        <div className="md:mx-[20%] mx-4 flex flex-col">
+            <div className="text-3xl font-semibold mt-10 mb-1 text-start">
                 {post.title}
             </div>
+
+            <div>{post.description}</div>
 
             <div className="flex items-center my-3 md:text-sm text-xs font-medium text-gray-500">
                 <p>

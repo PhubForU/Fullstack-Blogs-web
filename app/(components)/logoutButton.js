@@ -13,13 +13,13 @@ export default function LogoutButton() {
             return;
         }
         toast.success("logged out sucessfully");
-        router.push("/");
+        router.push(window.location.pathname);
     }
     return (
         <button
             type="submit"
             onClick={handleSubmit}
-            className="mr-3 px-3 py-[1.5px] rounded-sm text-[14px] font-medium cursor-pointer bg-white text-black"
+            className="px-[10px] py-[1.5px] rounded-sm cursor-pointer bg-white text-black"
         >
             Logout
         </button>

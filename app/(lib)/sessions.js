@@ -3,8 +3,11 @@ import * as jose from "jose";
 import { revalidatePath } from "next/cache";
 import { cookies } from "next/headers";
 import { redirect } from "next/navigation";
+import { PrismaClient } from "@prisma/client";
 
 const secret = new TextEncoder().encode(process.env.JWT_SECRET);
+
+const prisma = new PrismaClient();
 
 const alg = "HS256";
 
@@ -31,6 +34,50 @@ export async function encrypt(user) {
     } catch (err) {
         console.log(err);
         return false;
+    }
+}
+
+export async function followUser(userId) {
+    try {
+        const currentUser = await decrypt(cookies().get("session")?.value);
+        const AlreadyFollowing = await prisma.follows.findFirst({
+            where: {
+                AND: {
+                    followingId: userId,
+                    followedById: currentUser.id,
+                },
+            },
+        });
+        if (AlreadyFollowing) {
+            throw new Error("already following");
+        }
+
+        if (!currentUser) {
+            throw new Error("not authorised");
+        }
+        const res = await prisma.follows.create({
+            data: {
+                followedById: currentUser.id, //current user OR user who want to follow other
+                followingId: userId, // id of user, which current user want to follow
+            },
+        });
+        return { message: "followed sucessfully", success: true };
+    } catch (err) {
+        return { message: err.message, success: false };
+    }
+}
+
+export async function unFollowUser(userId, currentUserId) {
+    try {
+        const res = await prisma.follows.create({
+            data: {
+                followedById: currentUserId, //current user OR user who want to follow other
+                followingId: userId, // id of user, which current user want to follow
+            },
+        });
+        return { message: "followed sucessfully", success: true };
+    } catch (err) {
+        return { message: err.message, success: false };
     }
 }
 
