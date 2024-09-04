@@ -1,5 +1,5 @@
 generator client {
-  provider = "prisma-client-js"
+  provider        = "prisma-client-js"
   previewFeatures = ["fullTextSearch"]
 }
 
@@ -15,23 +15,35 @@ model User {
   password String
   posts    Post[]
   comments Comment[]
+  following Follows[] @relation("followedBy")
+  followers  Follows[] @relation("following")
 }
+
+model Follows {
+  id           String @id @default(auto()) @map("_id") @db.ObjectId
+  followedBy   User   @relation("followedBy", fields: [followedById], references: [id])
+  followedById String @db.ObjectId
+  following    User   @relation("following", fields: [followingId], references: [id])
+  followingId  String @db.ObjectId
+  @@unique([followingId, followedById])
+}
+
 
 model Post {
   id          String    @id @default(auto()) @map("_id") @db.ObjectId
   title       String    @unique
   description String
-  content String
+  content     String
   image       String
   author      User      @relation(fields: [authorId], references: [id])
   category    String
   slug        String    @unique
   authorId    String    @db.ObjectId
   createdAt   DateTime  @default(now())
-  isEdited Boolean @default(false)
-  comments    Comment[] 
-  imageId String
-  likeCount Int @default(0)
+  isEdited    Boolean   @default(false)
+  comments    Comment[]
+  imageId     String
+  likeCount   Int       @default(0)
 }
 
 model Comment {
@@ -44,5 +56,5 @@ model Comment {
   post   Post   @relation(fields: [postId], references: [id], onDelete: Cascade)
   postId String @db.ObjectId
 
-  createdAt   DateTime  @default(now())
+  createdAt DateTime @default(now())
 }
