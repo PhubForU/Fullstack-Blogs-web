@@ -9,14 +9,15 @@ datasource db {
 }
 
 model User {
-  id       String    @id @default(auto()) @map("_id") @db.ObjectId
-  email    String    @unique
-  name     String    @unique
-  password String
-  posts    Post[]
-  comments Comment[]
+  id        String    @id @default(auto()) @map("_id") @db.ObjectId
+  email     String    @unique
+  name      String    @unique
+  password  String
+  posts     Post[]
+  comments  Comment[]
   following Follows[] @relation("followedBy")
-  followers  Follows[] @relation("following")
+  followers Follows[] @relation("following")
+  likes      Like[]
 }
 
 model Follows {
@@ -25,9 +26,9 @@ model Follows {
   followedById String @db.ObjectId
   following    User   @relation("following", fields: [followingId], references: [id])
   followingId  String @db.ObjectId
+
   @@unique([followingId, followedById])
 }
-
 
 model Post {
   id          String    @id @default(auto()) @map("_id") @db.ObjectId
@@ -43,7 +44,17 @@ model Post {
   isEdited    Boolean   @default(false)
   comments    Comment[]
   imageId     String
-  likeCount   Int       @default(0)
+  likes       Like[]
+}
+
+model Like {
+  id String @id @default(auto()) @map("_id") @db.ObjectId
+
+  likedById String @db.ObjectId
+  likedBy   User   @relation(fields: [likedById], references: [id])
+
+  postId String @db.ObjectId
+  post   Post   @relation(fields: [postId], references: [id], onDelete: Cascade)
 }
 
 model Comment {
