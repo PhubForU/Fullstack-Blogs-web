@@ -13,9 +13,6 @@ export default async function Home() {
 
     const prisma = new PrismaClient();
 
-    const twoDaysAgo = new Date();
-    twoDaysAgo.setDate(twoDaysAgo.getDate() - 2);
-
     const allposts = !currentUser.success
         ? await prisma.post.findMany({
               orderBy: {
@@ -29,7 +26,6 @@ export default async function Home() {
                   category: true,
                   slug: true,
                   createdAt: true,
-                  likeCount: true,
                   author: {
                       include: {
                           password: false,
@@ -38,6 +34,7 @@ export default async function Home() {
                   _count: {
                       select: {
                           comments: true,
+                          likes: true,
                       },
                   },
               },
@@ -65,7 +62,6 @@ export default async function Home() {
                   category: true,
                   slug: true,
                   createdAt: true,
-                  likeCount: true,
                   author: {
                       include: {
                           password: false,
@@ -74,6 +70,7 @@ export default async function Home() {
                   _count: {
                       select: {
                           comments: true,
+                          likes: true,
                       },
                   },
               },
@@ -101,7 +98,6 @@ export default async function Home() {
                   category: true,
                   slug: true,
                   createdAt: true,
-                  likeCount: true,
                   author: {
                       include: {
                           password: false,
@@ -110,6 +106,7 @@ export default async function Home() {
                   _count: {
                       select: {
                           comments: true,
+                          likes: true,
                       },
                   },
               },
@@ -156,7 +153,7 @@ export default async function Home() {
         <div className="w-[95%] pt-[35px] mx-auto grid md:grid-cols-[5fr,2fr] h-[94svh]">
             {/* 🔴 left section */}
 
-            <div className="md:pl-10">
+            <div className="md:pl-10 mb-5">
                 <form
                     action=""
                     className="bg-[#F4F4F4] sm:w-[60%] rounded-2xl grid grid-cols-[8fr,1fr]"
@@ -259,7 +256,7 @@ export default async function Home() {
             </div>
 
             {/* 👇 right side section 👇  */}
-            <div className="py-2 border-green-400 flex flex-col sm:flex-row md:flex-col  gap-3">
+            <div className="py-2 border-green-400 flex flex-col sm:flex-row md:flex-col sm:items-center  gap-3 ">
                 {TopUserstoFollow?.length > 0 ? (
                     <div className="flex flex-col gap-2 pb-4 w-full">
                         <div className="px-3 pb-3 font-semibold text-lg">
@@ -268,8 +265,11 @@ export default async function Home() {
 
                         <div className="flex flex-col gap-2 px-4">
                             {TopUserstoFollow.map((user) => (
-                                <Suspense fallback={<>loading..</>}>
-                                    <UserCard user={user} key={user.id} />
+                                <Suspense
+                                    fallback={<>loading..</>}
+                                    key={user.id}
+                                >
+                                    <UserCard user={user} />
                                 </Suspense>
                             ))}
                         </div>

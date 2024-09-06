@@ -54,7 +54,7 @@ export default function BlogCard({ post }) {
                                 <CiHeart color="#FF0808" size={"0.8em"} />
                             </div>
                             <div className="text-[10px] font-semibold">
-                                {post.likeCount}
+                                {post._count.likes}
                             </div>
                         </div>
 

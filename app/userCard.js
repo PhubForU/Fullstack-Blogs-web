@@ -1,7 +1,7 @@
 "use client";
 
 import { useState } from "react";
-import { followUser, unFollowUsr } from "./action";
+import { followUser, unFollowUsr } from "./(components)/followAction";
 import toast from "react-hot-toast";
 import { useRouter } from "next/navigation";
 import { RiUserUnfollowLine, RiUserFollowLine } from "react-icons/ri";
@@ -44,7 +44,7 @@ export default function UserCard({ user }) {
                 className="w-[38px]"
             />
 
-            <div className="flex flex-col w-[28%]">
+            <div className="flex flex-col w-[45%] sm:w-[29%]">
                 <Link href={`/user/${user.id}`}>
                     <div className="text-[14px] font-semibold hover:underline mb-[2px]">
                         {user.name}

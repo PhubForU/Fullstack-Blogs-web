@@ -13,7 +13,7 @@ export default function LogoutButton() {
             return;
         }
         toast.success("logged out sucessfully");
-        router.push(window.location.pathname);
+        window.location.reload();
     }
     return (
         <button

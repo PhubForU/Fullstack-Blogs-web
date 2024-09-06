@@ -1,4 +1,3 @@
-import prisma from "@/app/(lib)/prisma";
 import { notFound } from "next/navigation";
 import { Comment } from "./comments";
 import { decrypt } from "@/app/(lib)/sessions";
@@ -13,13 +12,41 @@ import { FaCircleUser } from "react-icons/fa6";
 import { MdLogin } from "react-icons/md";
 import Link from "next/link";
 import { AiTwotoneEdit } from "react-icons/ai";
+import UserFollowButton from "./userFollowButton";
+import { PrismaClient } from "@prisma/client";
+import Likes from "./likes";
+import { TfiCommentAlt } from "react-icons/tfi";
 
 export default async function Slug({ params }) {
+    const prisma = new PrismaClient();
+
     const post = await prisma.post.findFirst({
         where: {
             slug: params.slug,
         },
-        include: {
+        select: {
+            id: true,
+            title: true,
+            description: true,
+            content: true,
+            image: true,
+            category: true,
+            slug: true,
+            author: {
+                select: {
+                    id: true,
+                    name: true,
+                    password: false,
+                    _count: {
+                        select: {
+                            followers: true,
+                        },
+                    },
+                },
+            },
+            createdAt: true,
+            isEdited: true,
+            imageId: true,
             comments: {
                 include: {
                     cmntAuthor: {
@@ -27,14 +54,19 @@ export default async function Slug({ params }) {
                             password: false,
                         },
                     },
+                    cmntAuthorId: false,
+                    id: false,
+                    postId: false,
                 },
                 orderBy: {
                     createdAt: "desc",
                 },
             },
-            author: {
-                include: {
-                    password: false,
+            likes: false,
+            _count: {
+                select: {
+                    comments: true,
+                    likes: true,
                 },
             },
         },
@@ -44,9 +76,9 @@ export default async function Slug({ params }) {
         return notFound();
     }
 
-    const comments = post.comments;
-
     const currentUser = await decrypt(cookies().get("session")?.value);
+
+    const comments = post.comments;
 
     let buffer = await fetch(post?.image).then(async (res) => {
         return Buffer.from(await res.arrayBuffer());
@@ -54,29 +86,76 @@ export default async function Slug({ params }) {
 
     const { base64 } = await getPlaiceholder(buffer);
 
+    const isFollowing = currentUser.success
+        ? await prisma.follows.findFirst({
+              where: {
+                  followedById: currentUser.id,
+                  followingId: post.author.id,
+              },
+          })
+        : false;
+
+    const isLiked = currentUser.success
+        ? await prisma.like.findFirst({
+              where: {
+                  postId: post.id,
+                  likedById: currentUser.id,
+              },
+          })
+        : false;
+
     return (
-        <div className="md:mx-[20%] mx-4 flex flex-col">
-            <div className="text-3xl font-semibold mt-10 mb-1 text-start">
+        <div className="sm:mx-[17%] md:mx-[19%] mx-4 flex flex-col mt-10 gap-1 ">
+            <div className="text-[30px] md:text-[39px] font-semibold  text-start">
                 {post.title}
             </div>
 
-            <div>{post.description}</div>
+            <div className="font-medium text-[13.5px] leading-7 mb-5 mt-2">
+                {post.description}
+            </div>
 
-            <div className="flex items-center my-3 md:text-sm text-xs font-medium text-gray-500">
-                <p>
-                    posted by{" "}
-                    {currentUser?.id == post?.author?.id
-                        ? "you"
-                        : "@" + post?.author?.name}
-                </p>
+            {/* Author Details */}
 
-                <div className="mx-[6px]">
-                    <GoDotFill color="grey" size={"0.5em"} />
+            <div className="my-1 flex items-center gap-3">
+                <img
+                    src="https://i.pravatar.cc/150?img=57"
+                    alt="profile"
+                    className="w-[41px] rounded-full pt-[2px]"
+                />
+
+                {currentUser?.id != post?.author.id ? (
+                    <UserFollowButton
+                        user={post.author}
+                        slug={params.slug}
+                        followStatus={isFollowing}
+                        isLoggedIn={currentUser.success}
+                    />
+                ) : (
+                    <div className="font-semibold text-sm flex items-center gap-4">
+                        <div>posted by you 💖</div>
+
+                        <div className="flex items-center md:text-sm text-xs font-medium text-gray-500 gap-3">
+                            <Link href={`/update/${post?.id}`}>
+                                <button className="flex items-center gap-2 px-2 py-[6px] rounded-md bg-gray-100 hover:bg-gray-200 text-xs">
+                                    <AiTwotoneEdit />
+                                    <p className="pr-1">Edit</p>
+                                </button>
+                            </Link>
+
+                            <DeleteButton
+                                id={post?.id}
+                                imageId={post?.imageId}
+                            />
+                        </div>
+                    </div>
+                )}
+            </div>
+
+            {/* posted ago? */}
+            <div className="flex items-center mb-1 mt-2 text-[13px] pl-2 font-medium text-gray-500">
+                <div>
+                    posted <Timeago date={post?.createdAt} />
                 </div>
-
-                <p>
-                    <Timeago date={post?.createdAt} />
-                </p>
 
                 {post?.isEdited && (
                     <div className="flex items-center">
@@ -88,22 +167,24 @@ export default async function Slug({ params }) {
                 )}
             </div>
 
-            {/* edit and delete buttons */}
-            {currentUser?.id == post?.author?.id ? (
-                <div className="flex items-center mt-[6px] mb-3 md:text-sm text-xs font-medium text-gray-500 gap-3">
-                    <DeleteButton id={post?.id} imageId={post?.imageId} />
-
-                    <Link href={`/update/${post?.id}`}>
-                        <button className="flex items-center gap-2 px-2 py-1 rounded-md bg-slate-100 hover:bg-slate-200">
-                            <AiTwotoneEdit />
-                            <p className="pr-1">Edit</p>
-                        </button>
-                    </Link>
+            {/* likes and comments */}
+            <div className="my-3 items-center w-[60%] flex gap-6">
+                <Likes
+                    likeStatus={isLiked}
+                    NoOfLikes={post._count.likes}
+                    slug={post.slug}
+                    postId={post.id}
+                    isLoggedIn={currentUser.success}
+                />
+                <div className="flex items-center gap-2">
+                    <TfiCommentAlt size={"0.95em"} />
+                    <div className="text-[12px] font-medium">
+                        {post._count.comments} Comments
+                    </div>
                 </div>
-            ) : (
-                ""
-            )}
+            </div>
 
+            {/* image container */}
             <div className="w-full overflow-hidden flex items-center justify-center rounded-md my-2">
                 <Image
                     src={post?.image}
@@ -122,7 +203,8 @@ export default async function Slug({ params }) {
                 }}
             />
 
-            <div className="w-full mt-10 mb-2 text-gray-600">
+            {/* Comment Section Starts Here */}
+            <div className="w-full mt-10 mb-2 text-gray-600" id="comments">
                 <div className="font-semibold text-3xl">Comments</div>
             </div>
 
@@ -143,7 +225,7 @@ export default async function Slug({ params }) {
                 )}
             </div>
 
-            <div className="w-full mt-2">
+            <div className="w-full mb-8">
                 {comments?.length == 0 ? (
                     <div className="flex gap-1 items-center mt-2 mb-8">
                         <TbFileSad size={"1.5em"} />
@@ -158,15 +240,15 @@ export default async function Slug({ params }) {
                                 <div className="flex gap-[10px] items-center py-3">
                                     <div className="">
                                         <FaCircleUser
-                                            size={"2.2em"}
+                                            size={"2.1em"}
                                             className="pt-[1px]"
                                         />
                                     </div>
 
-                                    <div className="flex flex-col gap-[1.1px]">
-                                        <div className="flex gap-[5px] items-center">
-                                            <p className="font-bold text-[14px]">
-                                                @{comment?.cmntAuthor.name}
+                                    <div className="flex flex-col">
+                                        <div className="flex gap-[4px] items-center">
+                                            <p className="font-bold text-[13px]">
+                                                {comment?.cmntAuthor.name}
                                             </p>
 
                                             <GoDotFill
@@ -174,13 +256,14 @@ export default async function Slug({ params }) {
                                                 size={"0.4em"}
                                             />
 
-                                            <p className="text-[12px] font-medium text-[grey]">
+                                            <p className="text-[11px] font-medium text-[grey]">
                                                 <Timeago
                                                     date={comment?.createdAt}
                                                 />
                                             </p>
                                         </div>
-                                        <div className="text-sm font-normal">
+
+                                        <div className="text-[12.5px] font-medium">
                                             {comment?.comment}
                                         </div>
                                     </div>
