@@ -12,12 +12,13 @@ model User {
   id        String    @id @default(auto()) @map("_id") @db.ObjectId
   email     String    @unique
   name      String    @unique
+  gender    String
   password  String
   posts     Post[]
   comments  Comment[]
   following Follows[] @relation("followedBy")
   followers Follows[] @relation("following")
-  likes      Like[]
+  likes     Like[]
 }
 
 model Follows {
@@ -36,7 +37,7 @@ model Post {
   description String
   content     String
   image       String
-  author      User      @relation(fields: [authorId], references: [id])
+  author      User      @relation(fields: [authorId], references: [id], onDelete: Cascade)
   category    String
   slug        String    @unique
   authorId    String    @db.ObjectId
