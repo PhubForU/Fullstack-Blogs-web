@@ -27,7 +27,6 @@ export async function encrypt(user) {
             .sign(secret);
         return jwt;
     } catch (err) {
-        console.log(err);
         return false;
     }
 }

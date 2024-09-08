@@ -53,7 +53,7 @@ p.is-editor-empty:first-child::before {
 .text-field {
     border: 2px solid gray;
     border-radius: 10px;
-    width: 90%;
+    width: 100%;
     padding: 9px;
     font-size: 15px;
     margin-top: 10px;
@@ -81,6 +81,7 @@ input:focus {
     width: 86%;
     font-size: 11px;
     color: red;
+    padding-left: 5px;
 }
 
 .code-area {

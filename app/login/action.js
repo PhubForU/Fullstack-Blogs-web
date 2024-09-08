@@ -18,6 +18,7 @@ export default async function loginAction({ email, password }) {
                     id: user.id,
                     email: user.email,
                     name: user.name,
+                    gender: user.gender,
                 });
                 if (session.success) {
                     return { ...session };
@@ -29,6 +30,7 @@ export default async function loginAction({ email, password }) {
             }
         }
     } catch (err) {
+        console.log(err);
         return { message: "invalid username or password", success: false };
     }
 }

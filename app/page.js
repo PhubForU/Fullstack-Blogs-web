@@ -132,6 +132,7 @@ export default async function Home() {
                   id: true,
                   name: true,
                   email: true,
+                  gender: true,
                   _count: {
                       select: { followers: true },
                   },

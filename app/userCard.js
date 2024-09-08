@@ -40,8 +40,12 @@ export default function UserCard({ user }) {
     return (
         <div className=" flex items-center hover:bg-[#f5f5f5] p-2 rounded-lg transition-all ease-in-out duration-500 cursor-pointer gap-3">
             <img
-                src="https://avatar.iran.liara.run/public/42"
-                className="w-[38px]"
+                src={
+                    user.gender == "male"
+                        ? `https://api.dicebear.com/9.x/personas/svg?seed=${user.name}&backgroundColor=b6e3f4,c0aede,d1d4f9&eyes=happy,open,wink&facialHairProbability=0&hair=shortCombover&hairColor=362c47&mouth=bigSmile,smile,smirk&nose=smallRound&skinColor=d78774&body=squared`
+                        : `https://api.dicebear.com/9.x/personas/svg?seed=${user.name}&backgroundColor=b6e3f4,c0aede,d1d4f9&eyes=happy,open,wink&facialHairProbability=0&hair=bobBangs,bobCut,extraLong,long&hairColor=362c47&mouth=bigSmile,smile,smirk&nose=smallRound&skinColor=d78774&body=squared`
+                }
+                className="w-[38px] rounded-full"
             />
 
             <div className="flex flex-col w-[45%] sm:w-[29%]">

@@ -22,10 +22,15 @@ export default async function Header() {
                         className="flex items-center gap-[10px] px-1 cursor-pointer"
                     >
                         <img
-                            src="https://avatar.iran.liara.run/public/42"
+                            src={
+                                currentUser.gender == "male"
+                                    ? `https://api.dicebear.com/9.x/personas/svg?seed=${currentUser.name}&backgroundColor=b6e3f4,c0aede,d1d4f9&eyes=happy,open,wink&facialHairProbability=0&hair=shortCombover&hairColor=362c47&mouth=bigSmile,smile,smirk&nose=smallRound&skinColor=d78774&body=squared`
+                                    : `https://api.dicebear.com/9.x/personas/svg?seed=${currentUser.name}&backgroundColor=b6e3f4,c0aede,d1d4f9&eyes=happy,open,wink&facialHairProbability=0&hair=bobBangs,bobCut,extraLong,long&hairColor=362c47&mouth=bigSmile,smile,smirk&nose=smallRound&skinColor=d78774&body=squared`
+                            }
                             alt="profile"
-                            className="w-[33px]"
+                            className="w-[34px] rounded-full"
                         />
+
                         <div className="hover:underline">
                             Hi, {currentUser.name}
                         </div>

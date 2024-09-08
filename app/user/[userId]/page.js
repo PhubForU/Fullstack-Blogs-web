@@ -45,7 +45,7 @@ export default async function User({ params }) {
     return (
         <div>
             User page {user.name}
-            {/* <div>
+            <div>
                 your followers:
                 {user.followers.length != 0 ? (
                     <>
@@ -68,7 +68,7 @@ export default async function User({ params }) {
                 ) : (
                     <>you have not following any one</>
                 )}
-            </div> */}
+            </div>
         </div>
     );
 }

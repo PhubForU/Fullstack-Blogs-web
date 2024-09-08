@@ -21,7 +21,7 @@ import { BsBlockquoteLeft } from "react-icons/bs";
 export function Tiptap({ editor }) {
     return (
         <div>
-            <div className="flex px-1 gap-[10px] mt-4 md:flex-row flex-col">
+            <div className="flex px-1 gap-[10px] md:flex-row flex-col">
                 <div className="flex gap-[10px]">
                     {/* button for heading 1 */}
                     {editor?.isActive("heading", { level: 1 }) ? (

@@ -1,7 +1,8 @@
 "use server";
 import prisma from "../(lib)/prisma";
+import { createSession } from "../(lib)/sessions";
 
-export default async function signUpAction({ name, email, password }) {
+export default async function signUpAction({ name, gender, email, password }) {
     try {
         const emailExists = await prisma.user.findUnique({
             where: {
@@ -28,10 +29,24 @@ export default async function signUpAction({ name, email, password }) {
                 email,
                 name,
                 password,
+                gender,
             },
         });
+
         if (res) {
-            return { message: "created sucessfully", success: true };
+            const session = await createSession({
+                id: res.id,
+                email: res.email,
+                name: res.name,
+                gender: res.gender,
+            });
+            if (session.success) {
+                return { ...session };
+            } else {
+                throw new Error(session.message);
+            }
+        } else {
+            throw new Error("an error occured");
         }
     } catch (err) {
         return { message: err.message, success: false };

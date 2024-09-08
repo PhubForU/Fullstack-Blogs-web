@@ -33,7 +33,10 @@ export default function CreateForm() {
     const postSchema = z.object({
         title: z.string().min(1, { message: "please enter the title" }),
         category: z.string().min(1, { message: "please select category" }),
-        description: z.string().max(200, { message: "description too long" }),
+        description: z
+            .string()
+            .max(200, { message: "description too long" })
+            .min(1, { message: "please enter description" }),
     });
 
     //assigning zod resolver
@@ -122,51 +125,55 @@ export default function CreateForm() {
 
     //jsx form
     return (
-        <div className="h-[94svh] flex justify-center">
+        <div className="h-[94svh] flex flex-col items-center">
+            <div className="w-[95%] md:w-[67.5%] pt-6 pb-4 text-[22px] font-semibold text-[#333333]">
+                Start writing your blog..
+            </div>
+
             <form
                 onSubmit={handleSubmit(post)}
-                className="md:w-[88%] w-[92%] flex flex-col pt-10 pl-0 md:pl-10"
+                className="w-[95%] md:w-[68%] flex flex-col gap-2 h-full justify-evenly"
             >
                 {/* title input field */}
-                <div className="md:pb-4 pb-3 pl-1">
+                <div className="flex flex-col gap-2">
                     <input
                         {...register("title")}
                         type="text"
                         placeholder="Title..."
-                        className="border-b-2 md:w-[85%] w-[100%] focus:outline-none md:text-2xl text-xl font-medium pb-2"
+                        className="border-b-2 w-[100%] focus:outline-none text-xl font-medium px-2 py-1"
                     />
-                    <div className="h-3">
+                    <div>
                         {errors.title?.message && (
-                            <p className="text-red-400 font-medium text-xs pt-2">
-                                {errors.title?.message}*
+                            <p className="text-red-400 font-medium text-xs px-1">
+                                {errors.title?.message}
                             </p>
                         )}
                     </div>
                 </div>
 
-                <div className="md:pb-4 pb-3 pl-1">
+                <div className="flex flex-col gap-2">
                     <input
                         {...register("description")}
                         type="text"
                         placeholder="description..."
-                        className="border-b-2 md:w-[85%] w-[100%] focus:outline-none md:text-xl text-xl font-medium pb-2"
+                        className="border-b-2 w-[100%] focus:outline-none text-[13px] font-medium px-2 py-1"
                     />
-                    <div className="h-3">
+                    <div>
                         {errors.description?.message && (
-                            <p className="text-red-400 font-medium text-xs pt-2">
-                                {errors.description?.message}*
+                            <p className="text-red-400 font-medium text-xs px-1">
+                                {errors.description?.message}
                             </p>
                         )}
                     </div>
                 </div>
 
                 {/* select field and image input tag*/}
-                <div className="pt-[12px] md:flex gap-9 text-sm font-medium pb-2">
-                    <div className="md:w-[18%] w-[45%] mr-2">
+                <div className="md:flex gap-9 text-sm font-medium py-2">
+                    <div className="w-[75%] md:w-[20%] flex flex-col gap-2">
                         <select
                             {...register("category")}
                             id="drop"
-                            className="border-b-2 w-full pl-2 pb-2 pt-2 md:pt-1 rounded-md bg-none text-medium font-medium text-gray-500 focus:outline-none"
+                            className="border-b-2 w-full pl-2 pb-2 pt-2 md:pt-1 bg-none text-medium font-medium text-gray-500 focus:outline-none"
                         >
                             <option value="">select category</option>
                             <option value="science">science</option>
@@ -174,18 +181,18 @@ export default function CreateForm() {
                             <option value="food">food</option>
                         </select>
 
-                        <div className="h-4">
+                        <div>
                             {errors.category?.message && (
-                                <p className="text-red-400 font-medium text-xs pt-2 pl-1">
-                                    {errors.category?.message}*
+                                <p className="text-red-400 font-medium text-xs px-1">
+                                    {errors.category?.message}
                                 </p>
                             )}
                         </div>
                     </div>
 
-                    <div className="pt-5 md:pt-0">
-                        <div className="flex items-center pl-2 md:pl-0">
-                            <FaImage size={"1.5em"} />
+                    <div className="flex flex-col gap-2 pl-2 pt-5 sm:pt-0">
+                        <div className="flex items-center">
+                            <FaImage size={"1.1em"} />
                             <input
                                 {...register("image")}
                                 type="file"
@@ -195,7 +202,7 @@ export default function CreateForm() {
                                 accept="image/*"
                             />
                         </div>
-                        <div className="h-4">
+                        <div>
                             {imgErr && (
                                 <p className="text-red-400 font-medium text-xs pt-2 pl-1">
                                     {imgErr}*
@@ -206,9 +213,9 @@ export default function CreateForm() {
                 </div>
 
                 {/* rich tect editor */}
-                <div className="md:w-[85%] w-[100%]">
+                <div className="w-[100%] flex flex-col gap-2">
                     <Tiptap editor={editor} />
-                    <div className="pl-1 h-6 pt-2">
+                    <div className="px-1">
                         {contentErr && (
                             <p className="text-red-400 font-medium text-xs">
                                 {contentErr}*
@@ -217,7 +224,7 @@ export default function CreateForm() {
                     </div>
                 </div>
 
-                <div className="mt-2">
+                <div className="pb-5">
                     <button
                         type="submit"
                         disabled={isSubmitting}
