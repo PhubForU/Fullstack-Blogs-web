@@ -1,10 +1,44 @@
 "use client";
-import { ScaleLoader } from "react-spinners";
+import { GoDotFill } from "react-icons/go";
 
 export default function Loading() {
     return (
-        <div className="h-[85svh] w-full flex items-center justify-center">
-            <ScaleLoader height={25} margin={3} speedMultiplier={1} />
+        <div className="sm:mx-[17%] md:mx-[19%] mx-4 flex flex-col mt-10 gap-1 animate-pulse ">
+            <div className="text-[30px] md:text-[39px] font-semibold  text-start  rounded-md bg-gray-300 text-gray-300">
+                Lorem ipsum dolor sit, amet consectetur sdfasdf asfas
+            </div>
+
+            <div className="font-medium text-[13.5px] leading-7 my-7 bg-gray-300 text-gray-300 rounded-md">
+                Lorem ipsum dolor sit amet consectetur adipisicing elit.
+                Doloribus atque, obcaecati corrupti architecto nisi corporis
+            </div>
+
+            {/* Author Details */}
+
+            <div className="my-1 flex items-center gap-3">
+                <div className="w-[40px] rounded-full pt-[2px] bg-gray-300 h-[40px]" />
+
+                <div className="border-2 px-2 py-1 bg-gray-300 text-gray-300 rounded-md">
+                    jhasdfhkjsdfjsd
+                </div>
+            </div>
+
+            {/* posted ago? */}
+            <div className="flex items-center mb-1 mt-2 text-[13px] pl-2 font-medium text-gray-300">
+                <div className="bg-gray-300 rounded-md">
+                    posted sometime ago
+                </div>
+
+                <div className="flex items-center">
+                    <div className="mx-[6px] ">
+                        <GoDotFill color="grey" size={"0.5em"} />
+                    </div>
+                    <p className="bg-gray-300 rounded-md">Edited</p>
+                </div>
+            </div>
+
+            {/* image container */}
+            <div className="w-full bg-gray-300 h-[400px] my-3"></div>
         </div>
     );
 }

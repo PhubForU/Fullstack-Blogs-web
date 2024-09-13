@@ -6,19 +6,18 @@ import Image from "next/image";
 import DeleteButton from "./deleteButton";
 import { GoDotFill } from "react-icons/go";
 import Timeago from "../../(lib)/timeago";
-import { getPlaiceholder } from "plaiceholder";
 import { TbFileSad } from "react-icons/tb";
 import { MdLogin } from "react-icons/md";
 import Link from "next/link";
 import { AiTwotoneEdit } from "react-icons/ai";
-import { PrismaClient } from "@prisma/client";
 import Likes from "./likes";
 import { TfiCommentAlt } from "react-icons/tfi";
 import FollowUnfollowComponent from "@/app/(components)/followUnfollowComponent";
 import ConfettiComponent from "./confettiComponent";
+import prisma from "@/app/(lib)/prisma";
 
 export default async function Slug({ params }) {
-    const prisma = new PrismaClient();
+    const currentUser = await decrypt(cookies().get("session")?.value);
 
     const post = await prisma.post.findFirst({
         where: {
@@ -38,6 +37,11 @@ export default async function Slug({ params }) {
                     name: true,
                     password: false,
                     gender: true,
+                    followers: {
+                        where: {
+                            followedById: currentUser.id,
+                        },
+                    },
                     _count: {
                         select: {
                             followers: true,
@@ -63,7 +67,11 @@ export default async function Slug({ params }) {
                     createdAt: "desc",
                 },
             },
-            likes: false,
+            likes: {
+                where: {
+                    likedById: currentUser.id,
+                },
+            },
             _count: {
                 select: {
                     comments: true,
@@ -77,33 +85,15 @@ export default async function Slug({ params }) {
         return notFound();
     }
 
-    const currentUser = await decrypt(cookies().get("session")?.value);
-
     const comments = post.comments;
 
-    let buffer = await fetch(post?.image).then(async (res) => {
-        return Buffer.from(await res.arrayBuffer());
-    });
+    const isFollowing =
+        currentUser.success && post.author.followers?.length != 0
+            ? true
+            : false;
 
-    const { base64 } = await getPlaiceholder(buffer);
-
-    const isFollowing = currentUser.success
-        ? await prisma.follows.findFirst({
-              where: {
-                  followedById: currentUser.id,
-                  followingId: post.author.id,
-              },
-          })
-        : false;
-
-    const isLiked = currentUser.success
-        ? await prisma.like.findFirst({
-              where: {
-                  postId: post.id,
-                  likedById: currentUser.id,
-              },
-          })
-        : false;
+    const isLiked =
+        currentUser.success && post.likes.length != 0 ? true : false;
 
     return (
         <div className="sm:mx-[17%] md:mx-[19%] mx-4 flex flex-col mt-10 gap-1 ">
@@ -195,10 +185,8 @@ export default async function Slug({ params }) {
             <div className="w-full overflow-hidden flex items-center justify-center rounded-md my-2">
                 <Image
                     src={post?.image}
-                    placeholder="blur"
                     width={1130}
                     height={600}
-                    blurDataURL={base64}
                     alt="cover image"
                 />
             </div>
