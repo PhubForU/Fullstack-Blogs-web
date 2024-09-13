@@ -8,14 +8,14 @@ import { GoDotFill } from "react-icons/go";
 import Timeago from "../../(lib)/timeago";
 import { getPlaiceholder } from "plaiceholder";
 import { TbFileSad } from "react-icons/tb";
-import { FaCircleUser } from "react-icons/fa6";
 import { MdLogin } from "react-icons/md";
 import Link from "next/link";
 import { AiTwotoneEdit } from "react-icons/ai";
-import UserFollowButton from "./userFollowButton";
 import { PrismaClient } from "@prisma/client";
 import Likes from "./likes";
 import { TfiCommentAlt } from "react-icons/tfi";
+import FollowUnfollowComponent from "@/app/(components)/followUnfollowComponent";
+import ConfettiComponent from "./confettiComponent";
 
 export default async function Slug({ params }) {
     const prisma = new PrismaClient();
@@ -37,6 +37,7 @@ export default async function Slug({ params }) {
                     id: true,
                     name: true,
                     password: false,
+                    gender: true,
                     _count: {
                         select: {
                             followers: true,
@@ -106,6 +107,8 @@ export default async function Slug({ params }) {
 
     return (
         <div className="sm:mx-[17%] md:mx-[19%] mx-4 flex flex-col mt-10 gap-1 ">
+            <ConfettiComponent />
+
             <div className="text-[30px] md:text-[39px] font-semibold  text-start">
                 {post.title}
             </div>
@@ -118,15 +121,19 @@ export default async function Slug({ params }) {
 
             <div className="my-1 flex items-center gap-3">
                 <img
-                    src="https://i.pravatar.cc/150?img=57"
+                    src={
+                        post.author?.gender == "male"
+                            ? `https://api.dicebear.com/9.x/personas/svg?seed=${post.author.name}&backgroundColor=b6e3f4,c0aede,d1d4f9&eyes=happy,open,wink&facialHairProbability=0&hair=shortCombover&hairColor=362c47&mouth=bigSmile,smile,smirk&nose=smallRound&skinColor=d78774&body=squared`
+                            : `https://api.dicebear.com/9.x/personas/svg?seed=${post.author.name}&backgroundColor=b6e3f4,c0aede,d1d4f9&eyes=happy,open,wink&facialHairProbability=0&hair=bobBangs,bobCut,extraLong,long&hairColor=362c47&mouth=bigSmile,smile,smirk&nose=smallRound&skinColor=d78774&body=squared`
+                    }
                     alt="profile"
-                    className="w-[41px] rounded-full pt-[2px]"
+                    className="w-[38px] rounded-full pt-[2px]"
                 />
 
                 {currentUser?.id != post?.author.id ? (
-                    <UserFollowButton
+                    <FollowUnfollowComponent
                         user={post.author}
-                        slug={params.slug}
+                        redirect={`blog/${params.slug}`}
                         followStatus={isFollowing}
                         isLoggedIn={currentUser.success}
                     />
@@ -238,12 +245,14 @@ export default async function Slug({ params }) {
                         {comments.map((comment, i) => (
                             <div key={i}>
                                 <div className="flex gap-[10px] items-center py-3">
-                                    <div className="">
-                                        <FaCircleUser
-                                            size={"2.1em"}
-                                            className="pt-[1px]"
-                                        />
-                                    </div>
+                                    <img
+                                        src={
+                                            comment?.cmntAuthor.gender == "male"
+                                                ? `https://api.dicebear.com/9.x/personas/svg?seed=${comment?.cmntAuthor.name}&backgroundColor=b6e3f4,c0aede,d1d4f9&eyes=happy,open,wink&facialHairProbability=0&hair=shortCombover&hairColor=362c47&mouth=bigSmile,smile,smirk&nose=smallRound&skinColor=d78774&body=squared`
+                                                : `https://api.dicebear.com/9.x/personas/svg?seed=${comment?.cmntAuthor.name}&backgroundColor=b6e3f4,c0aede,d1d4f9&eyes=happy,open,wink&facialHairProbability=0&hair=bobBangs,bobCut,extraLong,long&hairColor=362c47&mouth=bigSmile,smile,smirk&nose=smallRound&skinColor=d78774&body=squared`
+                                        }
+                                        className="w-[38px] rounded-full"
+                                    />
 
                                     <div className="flex flex-col">
                                         <div className="flex gap-[4px] items-center">

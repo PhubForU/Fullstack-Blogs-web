@@ -1,13 +1,14 @@
 "use client";
 import { followUser, unFollowUsr } from "@/app/(components)/followAction";
+import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useState } from "react";
 import toast from "react-hot-toast";
 import { RiUserUnfollowLine, RiUserFollowLine } from "react-icons/ri";
 
-export default function UserFollowButton({
+export default function FollowUnfollowComponent({
     user,
-    slug,
+    redirect,
     followStatus,
     isLoggedIn,
 }) {
@@ -19,7 +20,7 @@ export default function UserFollowButton({
 
     async function followButtonAction() {
         if (!isLoggedIn) {
-            router.push(`/login?redirect=/blog/${slug}`);
+            router.push(`/login?redirect=${redirect}`);
             return;
         }
 
@@ -44,7 +45,9 @@ export default function UserFollowButton({
     return (
         <div className="flex items-center gap-6">
             <div className="">
-                <div className="font-semibold text-[15px]">{user.name}</div>
+                <div className="font-semibold text-[15px] hover:underline">
+                    <Link href={`/user/${user.id}`}>{user.name}</Link>
+                </div>
                 <div className="text-xs font-medium mb-1">
                     {followersCount} people follow
                 </div>

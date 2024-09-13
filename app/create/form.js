@@ -21,6 +21,7 @@ import { useRouter } from "next/navigation";
 import { FaImage } from "react-icons/fa6";
 import Placeholder from "@tiptap/extension-placeholder";
 import { MdOutlinePostAdd } from "react-icons/md";
+import confetti from "canvas-confetti";
 
 export default function CreateForm() {
     const router = useRouter();
@@ -35,7 +36,9 @@ export default function CreateForm() {
         category: z.string().min(1, { message: "please select category" }),
         description: z
             .string()
-            .max(200, { message: "description too long" })
+            .max(210, {
+                message: "description shouldn't be more than 200 characters.",
+            })
             .min(1, { message: "please enter description" }),
     });
 
@@ -70,7 +73,7 @@ export default function CreateForm() {
             if (!image.success) {
                 toast.dismiss(loadingToast);
                 toast(image.message, {
-                    icon: "🥴",
+                    icon: "😐",
                 });
                 return;
             }
@@ -90,13 +93,13 @@ export default function CreateForm() {
                 toast.error(result.message);
             } else {
                 toast.dismiss(loadingToast);
-                toast.success("Blog created sucessfully");
-                router.push(`/blog/${postData.slug}`);
+                toast.success("created sucessfully");
+                router.push(`/blog/${postData.slug}?c=true`);
             }
         } else {
             toast.dismiss(loadingToast);
             toast("title already exists, try a unique title", {
-                icon: "🥲",
+                icon: "😐",
             });
         }
     }
@@ -176,9 +179,13 @@ export default function CreateForm() {
                             className="border-b-2 w-full pl-2 pb-2 pt-2 md:pt-1 bg-none text-medium font-medium text-gray-500 focus:outline-none"
                         >
                             <option value="">select category</option>
-                            <option value="science">science</option>
-                            <option value="general">general</option>
-                            <option value="food">food</option>
+                            <option value="Coding">Coding</option>
+                            <option value="Science">Science</option>
+                            <option value="Tutorials">Tutorials</option>
+                            <option value="Cooking">Cooking</option>
+                            <option value="Nature">Nature</option>
+                            <option value="Entertainment">Entertainment</option>
+                            <option value="Personal care">Personal care</option>
                         </select>
 
                         <div>

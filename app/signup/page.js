@@ -18,7 +18,7 @@ export default function Signup() {
             .min(2, { message: "name should contain atleast 2 characters" }),
         password: z
             .string()
-            .min(4, { message: "password should contain atleast 4 character" }),
+            .min(6, { message: "password should contain atleast 6 character" }),
         gender: z.string().min(1, { message: "please select gender" }),
     });
 

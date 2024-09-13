@@ -41,7 +41,9 @@ export default function UpdateForm({ postData }) {
         category: z.string().min(1, { message: "please select category" }),
         description: z
             .string()
-            .max(200, { message: "description too long" })
+            .max(210, {
+                message: "description shouldn't be more than 200 characters.",
+            })
             .min(1, { message: "please enter description" }),
     });
 
@@ -196,9 +198,13 @@ export default function UpdateForm({ postData }) {
                             defaultValue={postData.category}
                         >
                             <option value="">select category</option>
-                            <option value="science">science</option>
-                            <option value="general">general</option>
-                            <option value="food">food</option>
+                            <option value="Coding">Coding</option>
+                            <option value="Science">Science</option>
+                            <option value="Tutorials">Tutorials</option>
+                            <option value="Cooking">Cooking</option>
+                            <option value="Nature">Nature</option>
+                            <option value="Entertainment">Entertainment</option>
+                            <option value="Personal care">Personal care</option>
                         </select>
 
                         <div>

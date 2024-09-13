@@ -11,7 +11,7 @@ export default async function loginAction({ email, password }) {
             },
         });
         if (user == null) {
-            throw new Error();
+            throw new Error("account doesn't exist, please register");
         } else {
             if (password == user.password) {
                 const session = await createSession({
@@ -26,11 +26,11 @@ export default async function loginAction({ email, password }) {
                     throw new Error(session.message);
                 }
             } else {
-                throw new Error();
+                throw new Error("invalid username or password");
             }
         }
     } catch (err) {
         console.log(err);
-        return { message: "invalid username or password", success: false };
+        return { message: err.message, success: false };
     }
 }

@@ -12,7 +12,7 @@ const cookie = {
     options: {
         secure: true,
         httpOnly: true,
-        expires: Date.now() + 60 * 60 * 1000,
+        expires: Date.now() + 48 * 60 * 60 * 1000,
         path: "/",
         sameSite: "strict",
     },

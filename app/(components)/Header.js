@@ -3,6 +3,7 @@ import LogoutButton from "./logoutButton";
 import { cookies } from "next/headers";
 import Link from "next/link";
 import { decrypt } from "../(lib)/sessions";
+import LoginButton from "./loginButton";
 
 export default async function Header() {
     const token = cookies().get("session")?.value;
@@ -17,10 +18,7 @@ export default async function Header() {
 
             {token ? (
                 <div className="flex h-full mr-2 sm:mr-6 items-center gap-2 sm:gap-4 text-sm font-semibold">
-                    <Link
-                        href={`/user/${currentUser.id}`}
-                        className="flex items-center gap-[10px] px-1 cursor-pointer"
-                    >
+                    <div className="flex items-center gap-[10px] px-1 cursor-pointer">
                         <img
                             src={
                                 currentUser.gender == "male"
@@ -31,10 +29,8 @@ export default async function Header() {
                             className="w-[34px] rounded-full"
                         />
 
-                        <div className="hover:underline">
-                            Hi, {currentUser.name}
-                        </div>
-                    </Link>
+                        <div>Hi, {currentUser.name}</div>
+                    </div>
 
                     <Link
                         href={"/create"}
@@ -48,26 +44,15 @@ export default async function Header() {
                     </div>
                 </div>
             ) : (
-                // <div className="flex gap-5 mr-6">
-                //     <div>
-                //         <img
-                //             src="https://avatar.iran.liara.run/public/42"
-                //             alt="profile"
-                //             className="w-[20px]"
-                //         />
-                //         <div>hey {currentUser?.name}</div>
-                //     </div>
-                //     <div className="bg-white text-[#333333] text-sm font-medium rounded-sm cursor-pointer flex items-center justify-center px-3">
-                //         <Link href={"/create"}>Write</Link>
-                //     </div>
-                //     <LogoutButton />
-                // </div>
-                <Link
-                    href={"/create"}
-                    className="rounded-sm text-sm font-semibold bg-white text-black px-[14px] py-[3px] mr-6"
-                >
-                    write
-                </Link>
+                <div className="flex h-full mr-2 sm:mr-6 items-center gap-3 sm:gap-4 text-sm font-semibold">
+                    <Link
+                        href={"/create"}
+                        className="rounded-sm bg-white text-black px-[14px] py-[2px]"
+                    >
+                        write
+                    </Link>
+                    <LoginButton />
+                </div>
             )}
         </div>
     );

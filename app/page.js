@@ -127,7 +127,7 @@ export default async function Home() {
                       not: currentUser.id,
                   },
               },
-              take: 3,
+              take: 4,
               select: {
                   id: true,
                   name: true,
@@ -156,7 +156,7 @@ export default async function Home() {
 
             <div className="md:pl-10 mb-5">
                 <form
-                    action=""
+                    action={search}
                     className="bg-[#F4F4F4] sm:w-[60%] rounded-2xl grid grid-cols-[8fr,1fr]"
                 >
                     <input
@@ -213,12 +213,16 @@ export default async function Home() {
                         <div className="pl-3 pt-2 mb-3 text-gray-400 font-semibold text-sm">
                             Recent activity
                         </div>
-                        {allposts.length != 0 &&
+
+                        {allposts.length != 0 ? (
                             allposts.map((post) => (
                                 <Link href={`/blog/${post.slug}`} key={post.id}>
                                     <BlogCard post={post} />
                                 </Link>
-                            ))}
+                            ))
+                        ) : (
+                            <></>
+                        )}
                     </div>
                 ) : (
                     <div>
@@ -258,7 +262,7 @@ export default async function Home() {
 
             {/* 👇 right side section 👇  */}
             <div className="py-2 border-green-400 flex flex-col sm:flex-row md:flex-col sm:items-center  gap-3 ">
-                {TopUserstoFollow?.length > 0 ? (
+                {TopUserstoFollow?.length > 0 && (
                     <div className="flex flex-col gap-2 pb-4 w-full">
                         <div className="px-3 pb-3 font-semibold text-lg">
                             Suggested People
@@ -275,8 +279,6 @@ export default async function Home() {
                             ))}
                         </div>
                     </div>
-                ) : (
-                    <></>
                 )}
 
                 {!currentUser.success && (

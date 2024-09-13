@@ -20,7 +20,7 @@ export default function Login() {
         email: z.string().email({ message: "Please enter correct email" }),
         password: z
             .string()
-            .min(4, { message: "password should contain atleast 4 character" }),
+            .min(6, { message: "password should contain atleast 6 character" }),
     });
 
     //useform for zod resolver
@@ -37,7 +37,7 @@ export default function Login() {
         const res = await loginAction(data);
         if (!res.success) {
             toast.dismiss(loadingToast);
-            setState(res.message);
+            toast.error(res.message);
         } else {
             if (redirect != null) {
                 toast.dismiss(loadingToast);
@@ -100,7 +100,7 @@ export default function Login() {
                     <button
                         type="submit"
                         disabled={isSubmitting}
-                        className="bg-black mt-4 text-white font-bold disabled:text-gray-500 disabled:cursor-wait w-[90%] rounded-lg h-10"
+                        className="bg-black mt-4 text-white font-bold disabled:text-gray-500 disabled:cursor-wait w-full rounded-lg h-10"
                     >
                         submit
                     </button>

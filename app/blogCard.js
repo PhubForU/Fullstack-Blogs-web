@@ -6,8 +6,8 @@ import { GoComment } from "react-icons/go";
 
 export default function BlogCard({ post }) {
     return (
-        <Suspense fallback="loading">
-            <div className="mb-2 py-2 rounded-md flex sm:mr-4 hover:bg-[#f9f9f9] transition-all ease-in-out duration-300 sm:flex-row flex-col items-center sm:justify-center gap-3">
+        <Suspense fallback={<div>loading....</div>}>
+            <div className="mb-2 py-2 rounded-md flex sm:mr-3 hover:bg-[#f9f9f9] transition-all ease-in-out duration-300 sm:flex-row flex-col items-center sm:justify-center gap-3">
                 {/* image container 👇 */}
                 <div className="w-[97%] sm:w-[29%] sm:ml-3 rounded-md overflow-hidden sm:h-[165px]">
                     <img

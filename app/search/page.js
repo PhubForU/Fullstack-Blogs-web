@@ -6,13 +6,14 @@ import Link from "next/link";
 import Image from "next/image";
 import { GoDotFill } from "react-icons/go";
 import Timeago from "../(lib)/timeago";
+import BlogCard from "../blogCard";
 
 export default async function Search({ searchParams }) {
     let data;
     const searchString = searchParams.query || "";
 
     const currentPage = searchParams.page || 1;
-    const postsPerPage = 4;
+    const postsPerPage = 3;
     const lastPost = currentPage * postsPerPage;
     const startPost = lastPost - postsPerPage;
 
@@ -21,56 +22,68 @@ export default async function Search({ searchParams }) {
     }
 
     if (searchString != "") {
-        // data = await prisma.post.findMany({
-        //     where: {
-        //         title: {
-        //             contains: searchString,
-        //             mode: "insensitive",
-        //         },
-        //     },
-        //     include: {
-        //         author: {
-        //             include: {
-        //                 password: false,
-        //             },
-        //         },
-        //     },
-        // });
+        data = await prisma.post.findMany({
+            where: {
+                title: {
+                    contains: searchString,
+                    mode: "insensitive",
+                },
+            },
+            select: {
+                title: true,
+                description: true,
+                image: true,
+                category: true,
+                slug: true,
+                createdAt: true,
+                author: {
+                    include: {
+                        password: false,
+                    },
+                },
+                _count: {
+                    select: {
+                        comments: true,
+                        likes: true,
+                    },
+                },
+            },
+        });
 
         //query for fuzzy searching inputstring
-        data = await prisma.post.aggregateRaw({
-            pipeline: [
-                {
-                    $search: {
-                        index: "default",
-                        text: {
-                            query: searchString,
-                            path: ["title", "description"],
-                            fuzzy: {
-                                maxEdits: 2,
-                                prefixLength: 2,
-                            },
-                        },
-                    },
-                },
-                {
-                    $lookup: {
-                        from: "User",
-                        localField: "authorId",
-                        foreignField: "_id",
-                        as: "author",
-                        pipeline: [
-                            {
-                                $project: {
-                                    password: false,
-                                    _id: false,
-                                },
-                            },
-                        ],
-                    },
-                },
-            ],
-        });
+        // data = await prisma.post.aggregateRaw({
+        //     pipeline: [
+        //         {
+        //             $search: {
+        //                 index: "default",
+        //                 text: {
+        //                     query: searchString,
+        //                     path: ["title", "description"],
+        //                     fuzzy: {
+        //                         maxEdits: 2,
+        //                         prefixLength: 2,
+        //                     },
+        //                 },
+        //             },
+        //         },
+        //         {
+        //             $lookup: {
+        //                 from: "User",
+        //                 localField: "authorId",
+        //                 foreignField: "_id",
+        //                 as: "author",
+        //                 pipeline: [
+        //                     {
+        //                         $project: {
+        //                             password: false,
+        //                             _id: false,
+        //                         },
+        //                     },
+        //                 ],
+        //             },
+        //         },
+        //     ],
+        // });
     }
 
     const totalPages = Math.ceil(data?.length / postsPerPage) || 1;
@@ -130,51 +143,56 @@ export default async function Search({ searchParams }) {
                 {data?.length == 0 ? (
                     <p>no posts found</p>
                 ) : (
-                    result?.map((post) => (
-                        <Link href={`/blog/${post.slug}`} key={post.slug}>
-                            <div className="mt-1 mb-3 flex flex-col item sm:flex-row gap-1 p-4 rounded-lg bg-gray-50 hover:bg-gray-100">
-                                <div className="sm:h-56 h-52 sm:w-[40%] md:w-[36%] rounded-md">
-                                    <img
-                                        src={post.image}
-                                        alt=""
-                                        className="w-full h-full object-cover rounded-md"
-                                    />
-                                </div>
+                    result?.map(
+                        (post) => (
+                            <Link href={`/blog/${post.slug}`} key={post.id}>
+                                <BlogCard post={post} />
+                            </Link>
+                        )
+                        // <Link href={`/blog/${post.slug}`} key={post.slug}>
+                        //     <div className="mt-1 mb-3 flex flex-col item sm:flex-row gap-1 p-4 rounded-lg bg-gray-50 hover:bg-gray-100">
+                        //         <div className="sm:h-56 h-52 sm:w-[40%] md:w-[36%] rounded-md">
+                        //             <img
+                        //                 src={post.image}
+                        //                 alt=""
+                        //                 className="w-full h-full object-cover rounded-md"
+                        //             />
+                        //         </div>
 
-                                <div className="flex flex-col gap-1 mx-4 max-h-44 sm:max-h-52 sm:w-[77%]">
-                                    <div className="text-lg font-semibold pt-2">
-                                        {post.title}
-                                    </div>
-                                    <div className="flex items-center mt-1 text-xs font-medium text-gray-500">
-                                        <div>
-                                            posted by @{post?.author[0].name}
-                                        </div>
+                        //         <div className="flex flex-col gap-1 mx-4 max-h-44 sm:max-h-52 sm:w-[77%]">
+                        //             <div className="text-lg font-semibold pt-2">
+                        //                 {post.title}
+                        //             </div>
+                        //             <div className="flex items-center mt-1 text-xs font-medium text-gray-500">
+                        //                 <div>
+                        //                     posted by @{post?.author[0].name}
+                        //                 </div>
 
-                                        <div className="mx-[6px]">
-                                            <GoDotFill
-                                                color="grey"
-                                                size={"0.5em"}
-                                            />
-                                        </div>
-                                        <div>
-                                            <Timeago
-                                                date={post?.createdAt.$date}
-                                            />
-                                        </div>
-                                    </div>
-                                    <div
-                                        className="text-[12.5px] mt-1 mb-2 leading-5 truncate"
-                                        dangerouslySetInnerHTML={{
-                                            __html: post.description,
-                                        }}
-                                    />
-                                    <div className="font-semibold text-[12px] mb-2">
-                                        Read more..
-                                    </div>
-                                </div>
-                            </div>
-                        </Link>
-                    ))
+                        //                 <div className="mx-[6px]">
+                        //                     <GoDotFill
+                        //                         color="grey"
+                        //                         size={"0.5em"}
+                        //                     />
+                        //                 </div>
+                        //                 <div>
+                        //                     <Timeago
+                        //                         date={post?.createdAt.$date}
+                        //                     />
+                        //                 </div>
+                        //             </div>
+                        //             <div
+                        //                 className="text-[12.5px] mt-1 mb-2 leading-5 truncate"
+                        //                 dangerouslySetInnerHTML={{
+                        //                     __html: post.description,
+                        //                 }}
+                        //             />
+                        //             <div className="font-semibold text-[12px] mb-2">
+                        //                 Read more..
+                        //             </div>
+                        //         </div>
+                        //     </div>
+                        // </Link>
+                    )
                 )}
             </div>
 
