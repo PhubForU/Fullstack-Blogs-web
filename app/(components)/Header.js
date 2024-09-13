@@ -13,7 +13,7 @@ export default async function Header() {
             <Toaster position="bottom-center" reverseOrder={false} />
 
             <Link href={"/"}>
-                <p className="font-semibold ml-4">Blogs.</p>
+                <p className="font-semibold ml-4">Blogs</p>
             </Link>
 
             {token ? (
