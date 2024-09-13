@@ -10,18 +10,9 @@
     },
     "dependencies": {
         "@hookform/resolvers": "^3.9.0",
-        "@img/sharp-win32-x64": "^0.33.4",
         "@prisma/client": "^5.16.2",
-        "@tiptap/extension-blockquote": "^2.5.9",
-        "@tiptap/extension-bullet-list": "^2.5.9",
-        "@tiptap/extension-code": "^2.5.9",
-        "@tiptap/extension-code-block": "^2.5.9",
-        "@tiptap/extension-heading": "^2.5.9",
         "@tiptap/extension-highlight": "^2.5.9",
-        "@tiptap/extension-list-item": "^2.5.9",
-        "@tiptap/extension-ordered-list": "^2.5.9",
         "@tiptap/extension-placeholder": "^2.6.2",
-        "@tiptap/extension-strike": "^2.5.9",
         "@tiptap/extension-text-align": "^2.5.9",
         "@tiptap/extension-underline": "^2.5.9",
         "@tiptap/pm": "^2.5.8",
@@ -35,22 +26,21 @@
         "plaiceholder": "^3.0.0",
         "prisma": "^5.16.2",
         "react": "^18.3.1",
+        "react-confetti": "^6.1.0",
         "react-dom": "^18.3.1",
         "react-hook-form": "^7.52.1",
         "react-hot-toast": "^2.4.1",
         "react-icons": "^5.2.1",
-        "react-router-dom": "^6.26.1",
+        "react-spinners": "^0.14.1",
         "react-time-ago": "^7.3.3",
         "sharp": "^0.33.4",
         "sweetalert2": "^11.13.2",
-        "timeago-react": "^3.0.6",
         "zod": "^3.23.8"
     },
     "devDependencies": {
         "@tailwindcss/typography": "^0.5.14",
         "eslint": "^8",
         "eslint-config-next": "^14.2.5",
-        "postcss": "^8",
         "tailwindcss": "^3.4.1"
     }
 }
