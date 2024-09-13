@@ -38,7 +38,7 @@ export default function Loading() {
             </div>
 
             {/* image container */}
-            <div className="w-full bg-gray-300 h-[400px] my-3"></div>
+            <div className="w-full bg-gray-300 h-[280px] rounded-md sm:h-[400px] my-3"></div>
         </div>
     );
 }
