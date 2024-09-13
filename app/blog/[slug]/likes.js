@@ -2,25 +2,24 @@
 
 import { useRouter } from "next/navigation";
 import { useState } from "react";
-import { like, unLike } from "./likesAction";
 import toast from "react-hot-toast";
 import { IoMdHeart } from "react-icons/io";
 import { IoMdHeartEmpty } from "react-icons/io";
-import confetti from "canvas-confetti";
+import { like, unLike } from "./action";
 
-export default function Likes({
+export default function LikeButton({
     likeStatus,
     NoOfLikes,
     postId,
     slug,
-    isLoggedIn,
+    currentUser,
 }) {
     const [isLiked, setIsLiked] = useState(likeStatus);
     const [likeCount, setLikeCount] = useState(NoOfLikes);
     const router = useRouter();
 
     async function followButtonAction() {
-        if (!isLoggedIn) {
+        if (!currentUser.success) {
             router.push(`/login?redirect=/blog/${slug}`);
             return;
         }
@@ -31,7 +30,9 @@ export default function Likes({
             ? setLikeCount(parseInt(likeCount) - 1)
             : setLikeCount(parseInt(likeCount) + 1);
 
-        const res = isLiked ? await unLike(postId) : await like(postId);
+        const res = isLiked
+            ? await unLike(postId, currentUser.id)
+            : await like(postId, currentUser.id);
         if (!res.success) {
             isLiked ? setIsLiked(true) : setIsLiked(false);
             toast.error(res.message);

@@ -261,7 +261,7 @@ export default async function Home() {
             </div>
 
             {/* 👇 right side section 👇  */}
-            <div className="py-2 border-green-400 flex flex-col sm:flex-row md:flex-col sm:items-center  gap-3 ">
+            <div className="py-2 flex flex-col sm:flex-row md:flex-col sm:items-center  gap-3 ">
                 {TopUserstoFollow?.length > 0 && (
                     <div className="flex flex-col gap-2 pb-4 w-full">
                         <div className="px-3 pb-3 font-semibold text-lg">
@@ -274,7 +274,10 @@ export default async function Home() {
                                     fallback={<>loading..</>}
                                     key={user.id}
                                 >
-                                    <UserCard user={user} />
+                                    <UserCard
+                                        user={user}
+                                        currentUserId={currentUser.id}
+                                    />
                                 </Suspense>
                             ))}
                         </div>
@@ -306,9 +309,7 @@ export default async function Home() {
                     </div>
                 )}
 
-                {/* testing for .env  */}
-
-                <div className="h-[210px] my-2 md:h-[32%] rounded-3xl p-6 bg-[#f5f5f5] flex flex-col gap-3 justify-center">
+                <div className="h-[250px] my-2 md:h-[300px] rounded-3xl p-6 bg-[#f5f5f5] flex flex-col gap-3 justify-center">
                     <div className="flex flex-col text-[19px] font-semibold gap-[3px]">
                         <div>Share your thoughts,</div>
                         <div>Inspire the world</div>

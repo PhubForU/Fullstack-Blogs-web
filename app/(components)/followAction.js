@@ -1,18 +1,11 @@
 "use server";
-
-import { cookies } from "next/headers";
-import { decrypt } from "../(lib)/sessions";
 import prisma from "../(lib)/prisma";
 
-export async function unFollowUsr(userId) {
-    const currentUser = await decrypt(cookies().get("session")?.value);
+export async function unFollowUsr(userId, currentUserId) {
     try {
-        if (!currentUser.success) {
-            throw new Error("not authorised");
-        }
         const res = await prisma.follows.deleteMany({
             where: {
-                followedById: currentUser.id,
+                followedById: currentUserId,
                 followingId: userId,
             },
         });
@@ -22,15 +15,11 @@ export async function unFollowUsr(userId) {
     }
 }
 
-export async function followUser(userId) {
-    const currentUser = await decrypt(cookies().get("session")?.value);
+export async function followUser(userId, currentUserId) {
     try {
-        if (!currentUser.success) {
-            throw new Error("not authorised");
-        }
         const res = await prisma.follows.create({
             data: {
-                followedById: currentUser.id, //current user OR user who want to follow other
+                followedById: currentUserId, //current user OR user who want to follow other
                 followingId: userId, // id of user, which current user want to follow
             },
         });

@@ -1,11 +1,7 @@
 "use server";
 
-import { decrypt, verifySession } from "@/app/(lib)/sessions";
 import prisma from "../../(lib)/prisma";
-import { cookies } from "next/headers";
 import { v2 as cloudinary } from "cloudinary";
-import { notFound } from "next/navigation";
-import { revalidatePath, revalidateTag } from "next/cache";
 
 //function to send the details of post using id
 export async function getPostDetails(id) {

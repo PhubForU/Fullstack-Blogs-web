@@ -10,11 +10,11 @@ import { TbFileSad } from "react-icons/tb";
 import { MdLogin } from "react-icons/md";
 import Link from "next/link";
 import { AiTwotoneEdit } from "react-icons/ai";
-import Likes from "./likes";
 import { TfiCommentAlt } from "react-icons/tfi";
 import FollowUnfollowComponent from "@/app/(components)/followUnfollowComponent";
 import ConfettiComponent from "./confettiComponent";
 import prisma from "@/app/(lib)/prisma";
+import LikeButton from "./likes";
 
 export default async function Slug({ params }) {
     const currentUser = await decrypt(cookies().get("session")?.value);
@@ -125,7 +125,7 @@ export default async function Slug({ params }) {
                         user={post.author}
                         redirect={`blog/${params.slug}`}
                         followStatus={isFollowing}
-                        isLoggedIn={currentUser.success}
+                        currentUser={currentUser}
                     />
                 ) : (
                     <div className="font-semibold text-sm flex items-center gap-4">
@@ -166,12 +166,12 @@ export default async function Slug({ params }) {
 
             {/* likes and comments */}
             <div className="my-3 items-center w-[60%] flex gap-6">
-                <Likes
+                <LikeButton
                     likeStatus={isLiked}
                     NoOfLikes={post._count.likes}
                     slug={post.slug}
                     postId={post.id}
-                    isLoggedIn={currentUser.success}
+                    currentUser={currentUser}
                 />
                 <div className="flex items-center gap-2">
                     <TfiCommentAlt size={"0.95em"} />
@@ -206,7 +206,11 @@ export default async function Slug({ params }) {
             <div className="w-full h-[70px] py-2">
                 {cookies().get("session")?.value ? (
                     <div className="h-[70px]">
-                        <Comment postId={post.id} slug={params.slug} />
+                        <Comment
+                            postId={post.id}
+                            slug={params.slug}
+                            currentUserId={currentUser.id}
+                        />
                     </div>
                 ) : (
                     <div className="flex gap-2 items-center py-3">

@@ -3,13 +3,10 @@
 import { z } from "zod";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useForm } from "react-hook-form";
-import { useEffect, useState } from "react";
+import { useState } from "react";
 import {
     createSlug,
-    doTitleExist,
-    getPostDetails,
     replaceImage,
-    test,
     updatePostAction,
     validateTitle,
 } from "./action";
@@ -20,13 +17,10 @@ import Underline from "@tiptap/extension-underline";
 import Highlight from "@tiptap/extension-highlight";
 import TextAlign from "@tiptap/extension-text-align";
 import toast from "react-hot-toast";
-import { notFound, useRouter } from "next/navigation";
+import { useRouter } from "next/navigation";
 import { FaImage } from "react-icons/fa6";
 import Placeholder from "@tiptap/extension-placeholder";
 import { MdOutlinePostAdd } from "react-icons/md";
-import { verifySession } from "../../(lib)/sessions";
-import { useParams } from "next/navigation";
-import prisma from "@/app/(lib)/prisma";
 
 export default function UpdateForm({ postData }) {
     const postDetails = postData;

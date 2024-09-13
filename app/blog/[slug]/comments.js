@@ -6,7 +6,7 @@ import { useRef } from "react";
 import toast from "react-hot-toast";
 import { commentAction } from "./action";
 
-export function Comment({ postId, slug }) {
+export function Comment({ postId, slug, currentUserId }) {
     const formRef = useRef(null);
 
     const commentSchema = z.object({
@@ -23,7 +23,12 @@ export function Comment({ postId, slug }) {
 
     async function post(data) {
         try {
-            const res = await commentAction(postId, data.comment, slug);
+            const res = await commentAction(
+                postId,
+                data.comment,
+                slug,
+                currentUserId
+            );
             if (res.success) {
                 formRef.current?.reset();
                 toast.success("comment added");

@@ -21,9 +21,8 @@ import { useRouter } from "next/navigation";
 import { FaImage } from "react-icons/fa6";
 import Placeholder from "@tiptap/extension-placeholder";
 import { MdOutlinePostAdd } from "react-icons/md";
-import confetti from "canvas-confetti";
 
-export default function CreateForm() {
+export default function CreateForm({ currentUser }) {
     const router = useRouter();
 
     const [img, setImg] = useState(null);
@@ -87,12 +86,11 @@ export default function CreateForm() {
                 slug: await createSlug(data.title),
             };
 
-            const result = await createPostAction(postData);
+            const result = await createPostAction(postData, currentUser.id);
+            toast.dismiss(loadingToast);
             if (!result.success) {
-                toast.dismiss(loadingToast);
                 toast.error(result.message);
             } else {
-                toast.dismiss(loadingToast);
                 toast.success("created sucessfully");
                 router.push(`/blog/${postData.slug}?c=true`);
             }

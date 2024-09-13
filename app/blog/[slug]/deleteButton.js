@@ -2,7 +2,6 @@
 
 import toast from "react-hot-toast";
 import { deleteButtonAction } from "./action";
-import { useState } from "react";
 import { useRouter } from "next/navigation";
 import { AiTwotoneDelete } from "react-icons/ai";
 import Swal from "sweetalert2";

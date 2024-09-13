@@ -101,7 +101,7 @@ export default async function User({ params }) {
                                 user={user}
                                 redirect={`/user/${user.id}`}
                                 followStatus={isFollowing}
-                                isLoggedIn={currentUser.success}
+                                currentUser={currentUser}
                             />
                         ) : (
                             <></>

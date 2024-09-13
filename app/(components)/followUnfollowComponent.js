@@ -10,7 +10,7 @@ export default function FollowUnfollowComponent({
     user,
     redirect,
     followStatus,
-    isLoggedIn,
+    currentUser,
 }) {
     const [isFollowing, setIsFollowing] = useState(followStatus);
     const [followersCount, setFollowersCount] = useState(
@@ -19,7 +19,7 @@ export default function FollowUnfollowComponent({
     const router = useRouter();
 
     async function followButtonAction() {
-        if (!isLoggedIn) {
+        if (!currentUser.success) {
             router.push(`/login?redirect=${redirect}`);
             return;
         }
@@ -31,8 +31,8 @@ export default function FollowUnfollowComponent({
             : setFollowersCount(parseInt(followersCount) + 1);
 
         const res = isFollowing
-            ? await unFollowUsr(user.id)
-            : await followUser(user.id);
+            ? await unFollowUsr(user.id, currentUser.id)
+            : await followUser(user.id, currentUser.id);
 
         if (!res.success) {
             isFollowing ? setIsFollowing(true) : setIsFollowing(false);

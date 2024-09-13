@@ -1,22 +1,19 @@
 "use server";
-import { decrypt } from "@/app/(lib)/sessions";
 import prisma from "@/app/(lib)/prisma";
 import { revalidatePath } from "next/cache";
-import { cookies } from "next/headers";
 import { v2 as cloudinary } from "cloudinary";
 
-export async function commentAction(postId, comment, slug) {
+export async function commentAction(postId, comment, slug, currentUserId) {
     try {
-        const user = await decrypt(cookies().get("session")?.value);
-        const res = await prisma.comment.create({
+        await prisma.comment.create({
             data: {
                 comment: comment,
                 postId: postId,
-                cmntAuthorId: user.id,
+                cmntAuthorId: currentUserId,
             },
         });
         revalidatePath("/posts/" + slug);
-        return { res, success: true };
+        return { message: "added comment", success: true };
     } catch (err) {
         return { message: err.message, success: false };
     }
@@ -30,7 +27,7 @@ export async function deleteButtonAction(id, imageId) {
     });
 
     try {
-        const res = await prisma.post.delete({
+        await prisma.post.delete({
             where: {
                 id: id,
             },
@@ -38,6 +35,35 @@ export async function deleteButtonAction(id, imageId) {
         cloudinary.uploader.destroy(imageId);
         return { success: true };
     } catch (err) {
+        return { message: err.message, success: false };
+    }
+}
+
+export async function unLike(postId, currentUserId) {
+    try {
+        await prisma.like.deleteMany({
+            where: {
+                postId: postId,
+                likedById: currentUserId,
+            },
+        });
+        return { message: "removed from the liked posts", success: true };
+    } catch (err) {
+        return { message: err.message, success: false };
+    }
+}
+
+export async function like(postId, currentUserId) {
+    try {
+        await prisma.like.create({
+            data: {
+                likedById: currentUserId,
+                postId: postId,
+            },
+        });
+        return { message: "added to the liked posts", success: true };
+    } catch (err) {
+        console.log(err);
         return { message: err.message, success: false };
     }
 }

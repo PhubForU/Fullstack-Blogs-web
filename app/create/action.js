@@ -12,17 +12,11 @@ export async function uploadImage(FormData) {
         const arrayBuffer = await file.arrayBuffer();
         const buffer = new Uint8Array(arrayBuffer);
 
-        const user = await verifySession();
-
         cloudinary.config({
             cloud_name: process.env.CLOUDINARY_CLOUD_NAME,
             api_key: process.env.CLOUDINARY_API_KEY,
             api_secret: process.env.CLOUDINARY_API_SECRET,
         });
-
-        if (!user) {
-            throw new Error("you are not authorized, please login!");
-        }
 
         const post = await new Promise((resolve, reject) => {
             cloudinary.uploader
@@ -53,12 +47,8 @@ export async function createSlug(input) {
     return slug;
 }
 
-export async function createPostAction(data) {
+export async function createPostAction(data, currentUserId) {
     try {
-        const user = await decrypt(cookies().get("session")?.value);
-        if (!user.success) {
-            throw new Error("please login to post");
-        }
         const post = await prisma.post.create({
             data: {
                 title: data.title,
@@ -68,7 +58,7 @@ export async function createPostAction(data) {
                 imageId: data.imageId,
                 category: data.category,
                 slug: data.slug,
-                authorId: user.id,
+                authorId: currentUserId,
             },
         });
         return { ...post, success: true };

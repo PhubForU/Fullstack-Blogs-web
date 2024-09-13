@@ -7,7 +7,7 @@ import { useRouter } from "next/navigation";
 import { RiUserUnfollowLine, RiUserFollowLine } from "react-icons/ri";
 import Link from "next/link";
 
-export default function UserCard({ user }) {
+export default function UserCard({ user, currentUserId }) {
     const [isFollowing, setIsFollowing] = useState(false);
     const [followersCount, setFollowersCount] = useState(
         user?._count.followers
@@ -21,8 +21,8 @@ export default function UserCard({ user }) {
             : setFollowersCount(parseInt(followersCount) + 1);
 
         const res = isFollowing
-            ? await unFollowUsr(user.id)
-            : await followUser(user.id);
+            ? await unFollowUsr(user.id, currentUserId)
+            : await followUser(user.id, currentUserId);
 
         if (!res.success) {
             if ((res.message = "not authorised")) {
