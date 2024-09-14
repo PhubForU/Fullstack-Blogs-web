@@ -1,5 +1,4 @@
 "use client";
-import { GoDotFill } from "react-icons/go";
 
 export default function Loading() {
     return (
@@ -8,7 +7,7 @@ export default function Loading() {
                 Lorem ipsum dolor sit, amet consectetur sdfasdf asfas
             </div>
 
-            <div className="font-medium text-[13.5px] leading-7 my-7 bg-gray-300 text-gray-300 rounded-md">
+            <div className="font-medium text-[13.5px] leading-7 my-4 bg-gray-300 text-gray-300 rounded-md">
                 Lorem ipsum dolor sit amet consectetur adipisicing elit.
                 Doloribus atque, obcaecati corrupti architecto nisi corporis
             </div>
@@ -24,16 +23,9 @@ export default function Loading() {
             </div>
 
             {/* posted ago? */}
-            <div className="flex items-center mb-1 mt-2 text-[13px] pl-2 font-medium text-gray-300">
+            <div className="flex items-center mb-1 mt-2 text-[13px] pl-2 font-medium text-gray-300 gap-2">
                 <div className="bg-gray-300 rounded-md">
                     posted sometime ago
-                </div>
-
-                <div className="flex items-center">
-                    <div className="mx-[6px] ">
-                        <GoDotFill color="grey" size={"0.5em"} />
-                    </div>
-                    <p className="bg-gray-300 rounded-md">Edited</p>
                 </div>
             </div>
 

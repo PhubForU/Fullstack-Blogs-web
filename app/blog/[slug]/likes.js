@@ -1,11 +1,12 @@
 "use client";
 
 import { useRouter } from "next/navigation";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import toast from "react-hot-toast";
 import { IoMdHeart } from "react-icons/io";
 import { IoMdHeartEmpty } from "react-icons/io";
 import { like, unLike } from "./action";
+import Confetti from "react-confetti";
 
 export default function LikeButton({
     likeStatus,
@@ -24,11 +25,13 @@ export default function LikeButton({
             return;
         }
 
-        isLiked ? setIsLiked(false) : setIsLiked(true);
-
-        isLiked
-            ? setLikeCount(parseInt(likeCount) - 1)
-            : setLikeCount(parseInt(likeCount) + 1);
+        if (isLiked) {
+            setIsLiked(false);
+            setLikeCount(parseInt(likeCount) - 1);
+        } else {
+            setIsLiked(true);
+            setLikeCount(parseInt(likeCount) + 1);
+        }
 
         const res = isLiked
             ? await unLike(postId, currentUser.id)

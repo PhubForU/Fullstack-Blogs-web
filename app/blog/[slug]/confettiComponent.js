@@ -3,7 +3,6 @@
 import { useSearchParams } from "next/navigation";
 import { useEffect, useState } from "react";
 import Confetti from "react-confetti";
-import toast from "react-hot-toast";
 
 export default function ConfettiComponent() {
     const [width, setWidth] = useState(null);

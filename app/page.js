@@ -234,30 +234,12 @@ export default async function Home() {
                         </div>
 
                         <div className="flex flex-col gap-2 px-4">
-                            {TopUserstoFollow.map((user) => (
-                                <Suspense
-                                    fallback={
-                                        <div className=" flex items-center p-2 gap-3 text-gray-300 animate-pulse">
-                                            <div className="w-[40px] h-[40px] rounded-full bg-gray-300" />
-
-                                            <div className="flex flex-col w-[45%] sm:w-[29%] gap-1">
-                                                <div className="text-[14px] font-semibold mb-[2px] bg-gray-300 rounded-md">
-                                                    hari pajjuri
-                                                </div>
-
-                                                <div className="text-[9px] font-medium bg-gray-300 w-[50%] sm:w-[80%] rounded-md">
-                                                    some kuch
-                                                </div>
-                                            </div>
-                                        </div>
-                                    }
-                                    key={user.id}
-                                >
-                                    <UserCard
-                                        user={user}
-                                        currentUserId={currentUser.id}
-                                    />
-                                </Suspense>
+                            {TopUserstoFollow.map((user, i) => (
+                                <UserCard
+                                    user={user}
+                                    currentUserId={currentUser.id}
+                                    key={i}
+                                />
                             ))}
                         </div>
                     </div>
