@@ -37,8 +37,6 @@ export default function FollowUnfollowComponent({
         if (!res.success) {
             isFollowing ? setIsFollowing(true) : setIsFollowing(false);
             toast.error(res.message);
-        } else {
-            toast.success(`${res.message} ${user.name}`);
         }
     }
 

@@ -1,13 +1,20 @@
+"use client";
 import { GoDotFill } from "react-icons/go";
 import { Suspense } from "react";
 import Timeago from "./(lib)/timeago";
 import { CiHeart } from "react-icons/ci";
 import { GoComment } from "react-icons/go";
+import BlogCardSkeleton from "./blogCardSkeleton";
+import { useRouter } from "next/navigation";
 
 export default function BlogCard({ post }) {
+    const router = useRouter();
     return (
-        <Suspense fallback={<div>loading....</div>}>
-            <div className="mb-2 py-2 rounded-md flex sm:mr-3 hover:bg-[#f9f9f9] transition-all ease-in-out duration-300 sm:flex-row flex-col items-center sm:justify-center gap-3">
+        <Suspense fallback={<BlogCardSkeleton />}>
+            <div
+                onClick={() => router.push(`/blog/${post.slug}`)}
+                className="cursor-pointer my-4 py-2 rounded-md flex sm:mr-3 hover:bg-[#f9f9f9] transition-all ease-in-out duration-300 sm:flex-row flex-col items-center sm:justify-center gap-3"
+            >
                 {/* image container 👇 */}
                 <div className="w-[97%] sm:w-[29%] sm:ml-3 rounded-md overflow-hidden sm:h-[165px]">
                     <img

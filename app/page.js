@@ -13,34 +13,6 @@ export default async function Home() {
 
     const prisma = new PrismaClient();
 
-    const allposts = !currentUser.success
-        ? await prisma.post.findMany({
-              orderBy: {
-                  createdAt: "desc",
-              },
-              take: 6,
-              select: {
-                  title: true,
-                  description: true,
-                  image: true,
-                  category: true,
-                  slug: true,
-                  createdAt: true,
-                  author: {
-                      include: {
-                          password: false,
-                      },
-                  },
-                  _count: {
-                      select: {
-                          comments: true,
-                          likes: true,
-                      },
-                  },
-              },
-          })
-        : [];
-
     const postsFromFollowing = currentUser.success
         ? await prisma.post.findMany({
               where: {
@@ -112,6 +84,36 @@ export default async function Home() {
               },
           })
         : [];
+
+    const totalPosts = [...postsFromFollowing, ...postsFromRemaining];
+
+    const allposts = !currentUser.success
+        ? await prisma.post.findMany({
+              orderBy: {
+                  createdAt: "desc",
+              },
+              take: 6,
+              select: {
+                  title: true,
+                  description: true,
+                  image: true,
+                  category: true,
+                  slug: true,
+                  createdAt: true,
+                  author: {
+                      include: {
+                          password: false,
+                      },
+                  },
+                  _count: {
+                      select: {
+                          comments: true,
+                          likes: true,
+                      },
+                  },
+              },
+          })
+        : totalPosts;
 
     const TopUserstoFollow = currentUser.success
         ? await prisma.user.findMany({
@@ -208,56 +210,19 @@ export default async function Home() {
                     </div>
                 </div>
 
-                {!currentUser.success ? (
-                    <div className=" ml-0 mt-3 h-auto">
-                        <div className="pl-3 pt-2 mb-3 text-gray-400 font-semibold text-sm">
-                            Recent activity
-                        </div>
+                <div className=" ml-0 mt-3 h-auto">
+                    <div className="pl-3 pt-2 mb-3 text-gray-400 font-semibold text-sm">
+                        Recent activity
+                    </div>
 
-                        {allposts.length != 0 ? (
-                            allposts.map((post) => (
-                                <Link href={`/blog/${post.slug}`} key={post.id}>
-                                    <BlogCard post={post} />
-                                </Link>
-                            ))
-                        ) : (
-                            <></>
-                        )}
-                    </div>
-                ) : (
-                    <div>
-                        {postsFromFollowing.length != 0 && (
-                            <div className="ml-0 mt-3 h-auto">
-                                <div className="pl-3 pt-2 mb-2 text-gray-400 font-semibold text-sm">
-                                    Blogs by people you follow
-                                </div>
-                                {postsFromFollowing.map((post) => (
-                                    <Link
-                                        href={`/blog/${post.slug}`}
-                                        key={post.id}
-                                    >
-                                        <BlogCard post={post} />
-                                    </Link>
-                                ))}
-                            </div>
-                        )}
-                        {postsFromRemaining.length != 0 && (
-                            <div className="ml-0 mt-3 h-auto">
-                                <div className="pl-3 pt-2 mb-2 text-gray-400 font-semibold text-sm">
-                                    Recent blogs
-                                </div>
-                                {postsFromRemaining.map((post) => (
-                                    <Link
-                                        href={`/blog/${post.slug}`}
-                                        key={post.id}
-                                    >
-                                        <BlogCard post={post} />
-                                    </Link>
-                                ))}
-                            </div>
-                        )}
-                    </div>
-                )}
+                    {allposts.length != 0 ? (
+                        allposts.map((post, i) => (
+                            <BlogCard post={post} key={i} />
+                        ))
+                    ) : (
+                        <></>
+                    )}
+                </div>
             </div>
 
             {/* 👇 right side section 👇  */}
@@ -271,7 +236,21 @@ export default async function Home() {
                         <div className="flex flex-col gap-2 px-4">
                             {TopUserstoFollow.map((user) => (
                                 <Suspense
-                                    fallback={<>loading..</>}
+                                    fallback={
+                                        <div className=" flex items-center p-2 gap-3 text-gray-300 animate-pulse">
+                                            <div className="w-[40px] h-[40px] rounded-full bg-gray-300" />
+
+                                            <div className="flex flex-col w-[45%] sm:w-[29%] gap-1">
+                                                <div className="text-[14px] font-semibold mb-[2px] bg-gray-300 rounded-md">
+                                                    hari pajjuri
+                                                </div>
+
+                                                <div className="text-[9px] font-medium bg-gray-300 w-[50%] sm:w-[80%] rounded-md">
+                                                    some kuch
+                                                </div>
+                                            </div>
+                                        </div>
+                                    }
                                     key={user.id}
                                 >
                                     <UserCard

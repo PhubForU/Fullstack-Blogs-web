@@ -18,7 +18,7 @@ export default function Loading() {
             <div className="my-1 flex items-center gap-3">
                 <div className="w-[40px] rounded-full pt-[2px] bg-gray-300 h-[40px]" />
 
-                <div className="border-2 px-2 py-1 bg-gray-300 text-gray-300 rounded-md">
+                <div className="px-2 py-1 bg-gray-300 text-gray-300 rounded-md">
                     jhasdfhkjsdfjsd
                 </div>
             </div>

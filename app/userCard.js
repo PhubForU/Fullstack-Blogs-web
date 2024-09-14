@@ -32,8 +32,6 @@ export default function UserCard({ user, currentUserId }) {
             }
             toast.error(res.message);
             isFollowing ? setIsFollowing(true) : setIsFollowing(false);
-        } else {
-            toast.success(`${res.message} ${user.name}`);
         }
     }
 

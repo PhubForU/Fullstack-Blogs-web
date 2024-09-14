@@ -18,7 +18,7 @@ export default function LikeButton({
     const [likeCount, setLikeCount] = useState(NoOfLikes);
     const router = useRouter();
 
-    async function followButtonAction() {
+    async function likeActionButton() {
         if (!currentUser.success) {
             router.push(`/login?redirect=/blog/${slug}`);
             return;
@@ -36,13 +36,11 @@ export default function LikeButton({
         if (!res.success) {
             isLiked ? setIsLiked(true) : setIsLiked(false);
             toast.error(res.message);
-        } else {
-            toast.success(`${res.message}`);
         }
     }
     return (
         <div
-            onClick={followButtonAction}
+            onClick={likeActionButton}
             className="cursor-pointer flex items-center gap-1 "
         >
             <div className="flex items-center justify-center p-1">
