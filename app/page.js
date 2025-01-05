@@ -275,8 +275,7 @@ export default async function Home() {
                         <div>Share your thoughts,</div>
                         <div>Inspire the world</div>
                     </div>
-
-                    <div className="text-[13px] font-medium text-[#707070]">
+                    <div className=" font-medium text-[#707070] text-[13px]">
                         our story matters. start writing your blog today and let
                         your thoughts make an impact.
                     </div>

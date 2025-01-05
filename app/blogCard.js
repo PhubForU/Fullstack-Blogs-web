@@ -27,7 +27,7 @@ export default function BlogCard({ post }) {
                     {post.title}
                 </div>
 
-                <div className="sm:mr-20 pt-[2px] max-h-9 overflow-hidden text-[11.5px] font-medium leading-4 text-[#343434]">
+                <div className="sm:mr-20 line-clamp-2 pt-[2px] overflow-hidden text-[11.5px] font-medium leading-4 text-[#343434]">
                     {post.description}
                 </div>
 

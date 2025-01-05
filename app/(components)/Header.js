@@ -4,6 +4,8 @@ import { cookies } from "next/headers";
 import Link from "next/link";
 import { decrypt } from "../(lib)/sessions";
 import LoginButton from "./loginButton";
+import logo from "../../public/logo.png";
+import Image from "next/image";
 
 export default async function Header() {
     const token = cookies().get("session")?.value;
@@ -12,8 +14,9 @@ export default async function Header() {
         <div className="h-[6svh] bg-[#0E1111] flex items-center text-white justify-between ">
             <Toaster position="bottom-center" reverseOrder={false} />
 
-            <Link href={"/"}>
-                <p className="font-semibold ml-4">Blogs</p>
+            <Link href={"/"} className="flex items-center ml-4 gap-2">
+                <Image src={logo} width={40} className="bg-transparent" />
+                <p className="font-semibold">Blogs Hub</p>
             </Link>
 
             {token ? (
