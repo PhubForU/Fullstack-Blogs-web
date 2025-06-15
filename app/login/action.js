@@ -9,7 +9,7 @@ export default async function loginAction({ email, password }) {
             where: {
                 email: email,
             },
-        });
+        });//rajesh
         if (user == null) {
             throw new Error("account doesn't exist, please register");
         } else {
